@@ -1,35 +1,47 @@
-@import './base.css';
-
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
+nav{
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #eaeaea !important;
 }
 
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
+nav li{
+  color: #272727 !important;
+  border-radius: 10px;
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
+nav li a{
+  color: #272727 !important;
+  text-decoration: none !important;
 }
 
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
+nav li a:hover{
+  color: #fe761b !important;
+  text-decoration: none !important;
+}
 
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
+footer {
+  background-color: #272727 !important;
+  color: white !important;
+}
+
+.sidebar {
+  width: 250px;
+  min-height: 100vh;
+  background-color: #f8f9fa !important;
+}
+
+.sidebar-heading {
+  padding: 1rem 1.25rem;
+  font-size: 1.2rem;
+}
+
+.list-group-item.active {
+  background-color: #fe761b !important;
+  border-color: #fe761b !important;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+      width: 100%;
+      min-height: auto;
   }
 }
