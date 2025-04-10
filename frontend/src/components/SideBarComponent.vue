@@ -63,6 +63,12 @@ export default {
     goToPost(postId) {
       this.$router.push(`/${postId}`);
     },
+    createPost() {
+      this.$router.push("/createPost");
+    },
+    editPost(postId) {
+      this.$router.push(`/editPost/${postId}`);
+    },
   },
   mounted() {
     this.fetchPosts();
