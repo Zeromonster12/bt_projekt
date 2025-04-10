@@ -12,3 +12,4 @@ Route::get('/posts', [PostController::class, 'index']);
 Route::post('/createPost', [PostController::class, 'create']);
 Route::get('/searchPost', [PostController::class, 'show']);
 Route::get('/deletePost/{id}', [PostController::class, 'destroy']);
+Route::get('/post/{id}', [PostController::class, 'getPostById']);

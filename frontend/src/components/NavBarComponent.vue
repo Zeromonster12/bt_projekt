@@ -12,17 +12,17 @@
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         <router-link class="nav-link" to="/">
-                            <font-awesome-icon icon="home" /> Home
+                            Home
                         </router-link>
                     </li>
                     <li class="nav-item">
                         <router-link class="nav-link" to="/about">
-                            <font-awesome-icon icon="info-circle" /> About
+                            About
                         </router-link>
                     </li>
                     <li class="nav-item">
                         <router-link class="nav-link" to="/contact">
-                            <font-awesome-icon icon="envelope" /> Contact
+                            Contact
                         </router-link>
                     </li>
                 </ul>

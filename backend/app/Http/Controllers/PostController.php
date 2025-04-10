@@ -58,4 +58,15 @@ class PostController extends Controller
 
         return response()->json(['message' => 'Post sa odstranil'], 200);
     }
+
+    public function getPostById($id)
+    {
+        $post = Post::find($id);
+
+        if (!$post) {
+            return response()->json(['message' => 'Post not found'], 404);
+        }
+
+        return response()->json($post, 200);
+    }
 }
