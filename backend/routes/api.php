@@ -8,8 +8,19 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::get('/posts', [PostController::class, 'index']);
-Route::post('/createPost', [PostController::class, 'create']);
-Route::get('/searchPost', [PostController::class, 'show']);
-Route::get('/deletePost/{id}', [PostController::class, 'destroy']);
-Route::get('/post/{id}', [PostController::class, 'getPostById']);
+Route::middleware(['auth:sanctum', 'role:Admin'])->group(function () {
+    Route::post('/createPost', [PostController::class, 'create']);
+    Route::get('/deletePost/{id}', [PostController::class, 'destroy']);
+});
+
+Route::middleware(['auth:sanctum', 'role:Editor'])->group(function () {
+    Route::get('/posts', [PostController::class, 'index']);
+    Route::get('/searchPost', [PostController::class, 'show']);
+    Route::get('/post/{id}', [PostController::class, 'getPostById']);
+});
+
+Route::middleware(['auth:sanctum', 'role:Anonym'])->group(function () {
+    Route::get('/posts', [PostController::class, 'index']);
+    Route::get('/searchPost', [PostController::class, 'show']);
+    Route::get('/post/{id}', [PostController::class, 'getPostById']);
+});
