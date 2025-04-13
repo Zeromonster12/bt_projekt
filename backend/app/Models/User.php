@@ -19,7 +19,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
-        'email',
+        'email' => 'required|email|unique:users',
         'password',
     ];
 
@@ -45,4 +45,10 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function roles() {
+        return $this->belongsTo(Role::class);
+    }
+
+
 }

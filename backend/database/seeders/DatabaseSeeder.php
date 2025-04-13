@@ -2,8 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\Post;
+use App\Models\Role;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Year;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -15,9 +18,56 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        User::factory()->createMany([
+            [
+                'name' => 'Test User',
+                'email' => 'test@example.com',
+            ],
+            [
+                'name' => 'Test User 2',
+                'email' => 'test2@example.com',
+            ],
+            [
+                'name' => 'Test User 3',
+                'email' => 'test3@example.com',
+            ],
+        ]);
+
+        Year::factory()->create([
+            'year' => '2023',
+            'user_id' => 1
+        ],
+        [
+            'year' => '2024',
+            'user_id' => 1
+        ]);
+
+        Role::factory()->create([
+            'name' => 'admin',
+            'user_id' => 1,
+        ],[
+            'name' => 'editor',
+            'user_id' => 1
+        ],
+        [
+            'name' => 'anonym',
+            'user_id' => 1
+        ]);
+
+        Post::factory()->create([
+            'title' => 'Test Post',
+            'body' => 'This is a test post.',
+            'user_id' => 1
+        ],
+        [
+            'title' => 'Test Post 2',
+            'body' => 'This is another test post.',
+            'user_id' => 1
+        ],
+        [
+            'title' => 'Test Post 3',
+            'body' => 'This is yet another test post.',
+            'user_id' => 1
         ]);
     }
 }
