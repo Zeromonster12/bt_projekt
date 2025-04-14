@@ -17,7 +17,11 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // User::factory(10)->create();
-
+        Role::factory()->createMany([
+            ['name' => 'admin'],
+            ['name' => 'editor'],
+            ['name' => 'anonym'],
+        ]);
         User::factory()->createMany([
             [
                 'name' => 'Test User',
@@ -36,37 +40,11 @@ class DatabaseSeeder extends Seeder
         Year::factory()->create([
             'year' => '2023',
             'user_id' => 1
-        ],
-        [
-            'year' => '2024',
-            'user_id' => 1
-        ]);
-
-        Role::factory()->create([
-            'name' => 'admin',
-            'user_id' => 1,
-        ],[
-            'name' => 'editor',
-            'user_id' => 1
-        ],
-        [
-            'name' => 'anonym',
-            'user_id' => 1
         ]);
 
         Post::factory()->create([
             'title' => 'Test Post',
             'body' => 'This is a test post.',
-            'user_id' => 1
-        ],
-        [
-            'title' => 'Test Post 2',
-            'body' => 'This is another test post.',
-            'user_id' => 1
-        ],
-        [
-            'title' => 'Test Post 3',
-            'body' => 'This is yet another test post.',
             'user_id' => 1
         ]);
     }

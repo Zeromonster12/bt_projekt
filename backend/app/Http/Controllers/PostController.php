@@ -21,7 +21,7 @@ class PostController extends Controller
                 $query->where('title', 'LIKE', "%{$q}%")
                       ->orWhere('body', 'LIKE', "%{$q}%");
             })
-            ->get();
+            ->get(); //dorobit ked bude WYSIWYG
 
         if ($posts->isEmpty()) {
             return response()->json(['message' => 'Post sa nenašiel'], 404);

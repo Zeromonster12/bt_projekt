@@ -19,8 +19,9 @@ Route::middleware(['auth:sanctum', 'role:Editor'])->group(function () {
     Route::get('/post/{id}', [PostController::class, 'getPostById']);
 });
 
-Route::middleware(['auth:sanctum', 'role:Anonym'])->group(function () {
-    Route::get('/posts', [PostController::class, 'index']);
-    Route::get('/searchPost', [PostController::class, 'show']);
-    Route::get('/post/{id}', [PostController::class, 'getPostById']);
-});
+//TODO: LOGIN
+// Route::middleware(['auth:sanctum', 'role:Anonym'])->group(function () {
+Route::get('/posts', [PostController::class, 'index']);
+Route::get('/searchPost', [PostController::class, 'show']);
+Route::get('/post/{id}', [PostController::class, 'getPostById']);
+// });
