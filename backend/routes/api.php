@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +21,7 @@ Route::middleware(['auth:sanctum', 'role:Editor'])->group(function () {
 });
 
 //TODO: LOGIN
+Route::post('/login', [UserController::class, 'login']);
 // Route::middleware(['auth:sanctum', 'role:Anonym'])->group(function () {
 Route::get('/posts', [PostController::class, 'index']);
 Route::get('/searchPost', [PostController::class, 'show']);

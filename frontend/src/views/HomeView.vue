@@ -21,6 +21,8 @@ import Navbar from "../components/NavBarComponent.vue";
 import Sidebar from "../components/SideBarComponent.vue";
 import Footer from "../components/FooterComponent.vue";
 import YearBar from "../components/YearBarComponent.vue";
+import { useCounterStore } from "@/stores/counter";
+
 
 export default {
   name: "HomeView",
@@ -29,6 +31,15 @@ export default {
     Sidebar,
     Footer,
     YearBar,
+  },
+  data() {
+    return {
+      userName: '',
+      counter: useCounterStore(),
+    };
+  },
+  mounted() {
+    this.userName = this.counter.user.name;
   },
 };
 </script>

@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import Navbar from '../components/NavBarComponent.vue'
-</script>
-
 <template>
   <main>
     <Navbar class="top-navbar" />
@@ -16,11 +12,11 @@ import Navbar from '../components/NavBarComponent.vue'
               <form @submit.prevent="login">
                 <div class="mb-3">
                   <label for="email" class="form-label">Email address</label>
-                  <input type="email" class="form-control" id="email" v-model="email" required>
+                  <input type="email" class="form-control" id="email" v-model="creds.email" required>
                 </div>
                 <div class="mb-3">
                   <label for="password" class="form-label">Password</label>
-                  <input type="password" class="form-control" id="password" v-model="password" required>
+                  <input type="password" class="form-control" id="password" v-model="creds.password" required>
                 </div>
                 <div class="mb-3 form-check">
                   <input type="checkbox" class="form-check-input" id="remember" v-model="remember">
@@ -37,3 +33,39 @@ import Navbar from '../components/NavBarComponent.vue'
     </div>
   </main>
 </template>
+
+<script>
+import { useCounterStore } from '../stores/counter';
+import Navbar from '../components/NavBarComponent.vue'
+
+export default {
+  components: {
+    Navbar
+  },
+
+  data() {
+    return {
+      counter: useCounterStore(),
+      creds: {
+        email: '',
+        password: '',
+      },
+    }
+  },
+  methods: {
+    async login() {
+      try {
+        await this.counter.login(this.creds);
+        if (this.counter.token) {
+          this.$router.push('/');
+        }else{
+          alert('Zle prihlasovacie údaje');
+        }
+      } catch (error) {
+        alert('error');
+      }
+    }
+  },
+}
+
+</script>

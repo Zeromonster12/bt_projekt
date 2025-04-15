@@ -27,6 +27,7 @@
             <router-link class="nav-link" to="/contact">Contact</router-link>
           </li>
         </ul>
+        <span>Používateľ: {{ counter.user?.name }}</span>
         <form class="d-flex me-2" @submit.prevent="searchPosts">
           <input
             class="form-control"
@@ -39,20 +40,26 @@
             <font-awesome-icon icon="search" />
           </button>
         </form>
-        <router-link to="/login" class="btn btn-outline-primary">
+        <router-link v-if="!user" to="/login" class="btn btn-outline-primary">
           <font-awesome-icon icon="sign-in-alt" /> Login
         </router-link>
+        <button v-if="user" class="btn btn-outline-danger ms-2" @click="logout">
+          <font-awesome-icon icon="sign-out-alt" /> Logout
+        </button>
       </div>
     </div>
   </nav>
 </template>
 
 <script>
+import { useCounterStore } from '@/stores/counter';
 export default {
   name: "NavBarComponent",
   data() {
     return {
       searchPhrase: "",
+      userName: '',
+      counter: useCounterStore(),
     };
   },
   methods: {
@@ -62,6 +69,14 @@ export default {
         return;
       }
       this.$router.push({ name: "Search", query: { phrase: this.searchPhrase } });
+    },
+    logout() {
+      try{
+      this.counter.logout();
+      this.$router.push('/login');
+      }catch(error){
+        alert('Logout error: ', error);
+      }
     },
   },
 };
