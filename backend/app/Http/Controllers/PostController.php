@@ -10,7 +10,7 @@ class PostController extends Controller
 {
     public function index()
     {
-        return Post::select('id', 'image', 'title', 'body')->get();
+        return Post::select('id', 'image', 'title', 'body', "year")->get();
     }
 
     public function show(Request $request)

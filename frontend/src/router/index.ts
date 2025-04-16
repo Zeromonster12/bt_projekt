@@ -11,14 +11,27 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'home',
       component: HomeView,
       children: [
         {
-          path: ':id',
+          path: '',
+          redirect: '/2025/post/1',
+        },
+        {
+          path: ':year/post/:id',
           name: 'PostView',
           component: PostView,
           props: true,
+        },
+        {
+          path: 'createPost',
+          name: 'createPost',
+          component: CreatePostView,
+        },
+        {
+          path: 'editPost/:id',
+          name: 'editPost',
+          component: EditPostView,
         },
       ],
     },
@@ -28,31 +41,10 @@ const router = createRouter({
       component: LoginView,
     },
     {
-      path: '/about',
-      name: 'about',
-      component: LoginView,
-    },
-    {
-      path: '/contact',
-      name: 'contact',
-      component: LoginView,
-    },
-    {
-      path: '/createPost',
-      name: 'createPost',
-      component: CreatePostView,
-    },
-    {
-      path: '/editPost/:id',
-      name: 'editPost',
-      component: EditPostView,
-    },
-    {
-      path: '/Search',
+      path: '/search',
       name: 'Search',
       component: SearchView,
     }
-
 
   ],
 });

@@ -91,6 +91,29 @@ footer {
   margin: 0 auto;
 }
 
+.year-bar {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #eaeaea;
+  padding: 0.5rem 0;
+  text-align: center;
+}
+
+.year-item {
+  margin: 0 1rem;
+  color: #6c757d;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.year-item:hover {
+  color: #fe761b;
+}
+
+.year-item.active {
+  font-weight: bold;
+  color: #fe761b;
+}
+
 @media (max-width: 768px) {
   .content-wrapper {
     flex-direction: column;

@@ -3,10 +3,11 @@
     <div class="container">
       <div class="d-flex justify-content-center flex-wrap">
         <span 
-          v-for="year in reversedYears" 
+          v-for="year in years" 
           :key="year" 
           class="year-item"
           :class="{ active: year === currentYear }"
+          @click="selectYear(year)"
         >
           {{ year }}
         </span>
@@ -16,43 +17,57 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "YearBarComponent",
   data() {
     return {
-      years: [2020, 2021, 2022, 2023, 2024, 2025],
-      currentYear: new Date().getFullYear(),
+      years: [],
     };
   },
   computed: {
-    reversedYears() {
-      return [...this.years].reverse();
+    currentYear() {
+      return parseInt(this.$route.params.year) || new Date().getFullYear();
     },
+  },
+  methods: {
+    async fetchYears() {
+      try {
+        const response = await axios.get("http://127.0.0.1:8000/api/years");
+        this.years = response.data
+          .map((item) => parseInt(item.year))
+          .sort((a, b) => b - a);
+      } catch (error) {
+        console.error("Error fetching years:", error);
+      }
+    },
+    async selectYear(year) {
+      try {
+        const response = await axios.get("http://127.0.0.1:8000/api/posts");
+        const posts = response.data;
+        const filteredPosts = posts.filter((post) => post.year === year);
+
+        if (filteredPosts.length > 0) {
+          this.$router.push(`/${year}/post/${filteredPosts[0].id}`);
+        } else {
+          alert(`No posts available for the year ${year}`);
+        }
+      } catch (error) {
+        console.error("Error fetching posts for the selected year:", error);
+      }
+    },
+  },
+  watch: {
+    '$route.params.year'(newYear) {
+      this.$emit("year-selected", parseInt(newYear) || new Date().getFullYear());
+    },
+  },
+  mounted() {
+    this.fetchYears();
   },
 };
 </script>
 
 <style scoped>
-.year-bar {
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #eaeaea;
-  padding: 0.5rem 0;
-  text-align: center;
-}
-
-.year-item {
-  margin: 0 1rem;
-  color: #6c757d;
-  font-size: 0.9rem;
-  cursor: pointer;
-}
-
-.year-item:hover {
-  color: #fe761b;
-}
-
-.year-item.active {
-  font-weight: bold;
-  color: #fe761b;
-}
 </style>

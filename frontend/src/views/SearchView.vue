@@ -10,7 +10,7 @@
         <router-link 
           v-for="post in results" 
           :key="post.id" 
-          :to="'/' + post.id"
+          :to="'/' + post.year + '/post/' + post.id"
           class="post-item"
         >
           <h3>{{ post.title }}</h3>
