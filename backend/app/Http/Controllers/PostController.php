@@ -10,24 +10,28 @@ use App\Models\Post;
 class PostController extends Controller
 {
     public function index()
-    {
-        return Post::select('id', 'image', 'title', 'body', "year")->get();
-    }
+        {
+            return Post::select('posts.id', 'posts.title', 'posts.body', 'years.year')
+                ->join('years', 'posts.year_id', '=', 'years.id')
+                ->get();
+        }
 
     public function show(Request $request)
     {
         $q = $request->input('phrase');
         $posts = Post::query()
+            ->join('years', 'posts.year_id', '=', 'years.id')
             ->where(function ($query) use ($q) {
-                $query->where('title', 'LIKE', "%{$q}%")
-                      ->orWhere('body', 'LIKE', "%{$q}%");
+                $query->where('posts.title', 'LIKE', "%{$q}%")
+                      ->orWhere('posts.body', 'LIKE', "%{$q}%");
             })
-            ->get(); //dorobit ked bude WYSIWYG
-
+            ->select('posts.id', 'posts.image', 'posts.title', 'posts.body', 'years.year')
+            ->get();
+    
         if ($posts->isEmpty()) {
             return response()->json(['message' => 'Post sa nenašiel'], 404);
         }
-
+    
         return response()->json($posts, 200);
     }
 
@@ -71,13 +75,16 @@ class PostController extends Controller
     }
 
     public function getPostById($id)
-    {
-        $post = Post::find($id);
-
-        if (!$post) {
-            return response()->json(['message' => 'Post not found'], 404);
+        {
+            $post = Post::join('years', 'posts.year_id', '=', 'years.id')
+                ->where('posts.id', $id)
+                ->select('posts.*', 'years.year')
+                ->first();
+        
+            if (!$post) {
+                return response()->json(['message' => 'Post not found'], 404);
+            }
+        
+            return response()->json($post, 200);
         }
-
-        return response()->json($post, 200);
-    }
 }

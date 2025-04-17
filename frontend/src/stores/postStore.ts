@@ -7,6 +7,7 @@ export const usePostStore = defineStore('post', {
     filteredPosts: [],
     currentYear: new Date().getFullYear(),
     selectedPost: null,
+    years: [],
   }),
 
   actions: {
@@ -31,12 +32,13 @@ export const usePostStore = defineStore('post', {
 
     filterPostsByYear(year) {
       this.currentYear = year;
-      this.filteredPosts = this.posts.filter((post) => post.year === year);
+      this.filteredPosts = this.posts.filter((post) => parseInt(post.year) === parseInt(year));
     },
 
     handlePostDeleted(postId) {
       this.filteredPosts = this.filteredPosts.filter((post) => post.id !== postId);
     },
+
     async fetchYears() {
       try {
         const response = await api.get('/years');
@@ -52,8 +54,7 @@ export const usePostStore = defineStore('post', {
       try {
         const response = await api.get('/posts');
         const posts = response.data;
-        const filteredPosts = posts.filter((post) => post.year === year);
-    
+        const filteredPosts = posts.filter((post) => parseInt(post.year) === parseInt(year));
         if (filteredPosts.length > 0) {
           const firstPostId = filteredPosts[0].id;
           router.push(`/${year}/post/${firstPostId}`);
@@ -72,7 +73,7 @@ export const usePostStore = defineStore('post', {
 
         if (!post) {
           return { valid: false, message: `Post with ID ${postId} does not exist.` };
-        } else if (post.year !== year) {
+        } else if (parseInt(post.year) !== parseInt(year)) {
           return { valid: false, message: `Post with ID ${postId} does not exist in year ${year}.` };
         }
 
@@ -80,6 +81,6 @@ export const usePostStore = defineStore('post', {
       } catch (error) {
         return { valid: false, message: "An error occurred while fetching the post." };
       }
-    },
+    }
   },
 });
