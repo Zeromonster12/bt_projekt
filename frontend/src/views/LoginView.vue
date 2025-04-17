@@ -19,7 +19,7 @@
                   <input type="password" class="form-control" id="password" v-model="creds.password" required>
                 </div>
                 <div class="mb-3 form-check">
-                  <input type="checkbox" class="form-check-input" id="remember" v-model="remember">
+                  <input type="checkbox" class="form-check-input" id="remember" v-model="creds.remember">
                   <label class="form-check-label" for="remember">Remember me</label>
                 </div>
                 <div class="d-grid">
@@ -37,6 +37,9 @@
 <script>
 import { useCounterStore } from '../stores/counter';
 import Navbar from '../components/NavBarComponent.vue'
+import api from '../api';
+import axios from 'axios';
+import csrf from '@/csrf';
 
 export default {
   components: {
@@ -49,23 +52,30 @@ export default {
       creds: {
         email: '',
         password: '',
+        remember: false,
       },
     }
   },
   methods: {
-    async login() {
-      try {
-        await this.counter.login(this.creds);
-        if (this.counter.token) {
-          this.$router.push('/');
-        }else{
-          alert('Zle prihlasovacie údaje');
-        }
-      } catch (error) {
-        alert('error');
-      }
+    login() {
+      csrf.get('/sanctum/csrf-cookie')
+        .then(() => {
+          return this.counter.login(this.creds)
+        })
+        .then(() => {
+          if (this.counter.token) {
+            this.$router.push('/')
+          } else {
+            alert('Zlé prihlasovacie údaje')
+          }
+        })
+        .catch(() => {
+          alert('Chyba pri prihlasovaní')
+        })
     }
-  },
+  }
+
+
 }
 
 </script>
