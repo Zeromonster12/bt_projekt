@@ -8,6 +8,7 @@ export const useCounterStore = defineStore('counter', {
     user: null,
     response: null,
   }),
+
   actions: {
     async login(creds: { email: string, password: string }) {
       try {

@@ -1,9 +1,9 @@
 <template>
   <div class="create-post container mt-5">
-    <h1 class="mb-4">Create New Post</h1>
+    <h1 class="mb-4">Create New Post ROLE: {{ user?.role_id }}</h1>
     <form @submit.prevent="submitPost">
       <div class="form-group mb-3">
-        <label for="title" class="form-label">Title</label>
+        <label for="title" class="form-label"></label>
         <input
           type="text"
           id="title"
@@ -43,7 +43,8 @@
 </template>
 
 <script>
-import axios from "axios";
+import api from "@/api";
+import { useCounterStore } from "@/stores/counter";
 
 export default {
   name: "CreatePostView",
@@ -52,12 +53,14 @@ export default {
       title: "",
       content: "",
       image: "",
+      store: useCounterStore(),
+      user: null,
     };
   },
   methods: {
     async submitPost() {
       try {
-        const response = await axios.post("http://127.0.0.1:8000/api/createPost", {
+        const response = await api.post("/createPost", {
           title: this.title,
           body: this.content,
           image: this.image,
@@ -69,6 +72,9 @@ export default {
         alert("Failed to create post. Please try again.");
       }
     },
+  },
+  mounted() {
+    this.user = this.store.user;
   },
 };
 </script>

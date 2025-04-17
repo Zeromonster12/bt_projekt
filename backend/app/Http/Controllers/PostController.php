@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
 use Illuminate\Http\Request;
 use App\Models\Post;
 
@@ -32,11 +33,22 @@ class PostController extends Controller
 
     public function create(Request $request)
     {
+
+
+        $user = Auth::user();
+
+        if(!$user) {
+            return response()->json(['message' => 'Neprihlásený používatel - POSTCONTROLLER'], 401); 
+        }
+
+        $role = $user->role_name;
+
         $post = Post::create([
             'title' => $request->input('title'),
             'body' => $request->input('body'),
             'image' => $request->input('image'),
-            'user_id' => 1
+            'user_id' => 2,
+            'year_id' => 2,
         ]);
 
 
