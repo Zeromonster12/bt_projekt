@@ -53,14 +53,19 @@
 
 <script>
 import { useCounterStore } from '@/stores/counter';
+
 export default {
   name: "NavBarComponent",
   data() {
     return {
       searchPhrase: "",
-      userName: '',
       counter: useCounterStore(),
     };
+  },
+  computed: {
+    user() {
+      return this.counter.user;
+    },
   },
   methods: {
     searchPosts() {
@@ -71,10 +76,10 @@ export default {
       this.$router.push({ name: "Search", query: { phrase: this.searchPhrase } });
     },
     logout() {
-      try{
-      this.counter.logout();
-      this.$router.push('/login');
-      }catch(error){
+      try {
+        this.counter.logout();
+        this.$router.push('/login');
+      } catch (error) {
         alert('Logout error: ', error);
       }
     },

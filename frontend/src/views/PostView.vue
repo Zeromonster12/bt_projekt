@@ -1,6 +1,9 @@
 <template>
   <div>
-    <div v-if="post">
+    <div v-if="errorMessage">
+      <p class="error">{{ errorMessage }}</p>
+    </div>
+    <div v-else-if="post">
       <h2>{{ post.title }}</h2>
       <p>{{ post.body }}</p>
     </div>
@@ -11,7 +14,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import { usePostStore } from "../stores/postStore";
 
 export default {
   name: "PostView",
@@ -20,31 +23,38 @@ export default {
       type: String,
       required: true,
     },
+    year: {
+      type: String,
+      required: true,
+    },
+  },
+  computed: {
+    post() {
+      return this.postStore.selectedPost;
+    },
   },
   data() {
     return {
-      post: null,
+      postStore: usePostStore(),
+      errorMessage: "",
     };
-  },
-  methods: {
-    async fetchPost() {
-      try {
-        const response = await axios.get(
-          `http://127.0.0.1:8000/api/post/${this.id}`
-        );
-        this.post = response.data;
-      } catch (error) {
-        console.error("Error fetching post:", error);
-      }
-    },
   },
   watch: {
     id: {
       immediate: true,
-      handler() {
-        this.fetchPost();
+      async handler(newId) {
+        this.errorMessage = "";
+        const year = parseInt(this.year);
+
+        const validation = await this.postStore.validatePost(newId, year);
+        if (!validation.valid) {
+          this.errorMessage = validation.message;
+        }
       },
     },
   },
 };
 </script>
+
+<style scoped>
+</style>

@@ -9,8 +9,9 @@
       </div>
       <div
         class="list-group-item list-group-item-action list-group-item-light p-3"
-        v-for="post in posts"
+        v-for="post in postStore.filteredPosts"
         :key="post.id"
+        :class="{ active: post.id === activePostId }"
         @click="goToPost(post.id)"
       >
         <span>{{ post.title }}</span>
@@ -36,39 +37,41 @@
 </template>
 
 <script>
-import axios from "axios";
+import { usePostStore } from "@/stores/postStore";
 import { useCounterStore } from "@/stores/counter";
 
 export default {
   name: "SideBarComponent",
-  props: {
-    posts: {
-      type: Array,
-      required: true,
-    },
-    currentYear: {
-      type: Number,
-      required: true,
-    },
-  },
   computed: {
+    postStore() {
+      return usePostStore();
+    },
     isLoggedIn() {
       const counterStore = useCounterStore();
       return !!counterStore.token;
     },
+    activePostId() {
+      return parseInt(this.$route.params.id);
+    },
+  },
+  watch: {
+    $route: {
+      immediate: true,
+      handler() {
+        const year = parseInt(this.$route.params.year) || new Date().getFullYear();
+        this.postStore.filterPostsByYear(year);
+      },
+    },
   },
   methods: {
     async deletePost(postId) {
-      try {
-        await axios.get(`http://127.0.0.1:8000/api/deletePost/${postId}`);
-        this.$emit("post-deleted", postId);
-        alert("Post deleted successfully");
-      } catch (error) {
-        console.error("Error deleting post:", error);
+      const result = await this.postStore.deletePost(postId);
+      if (result.success) {
+        alert(result.message);
       }
     },
     goToPost(postId) {
-      this.$router.push(`/${this.currentYear}/post/${postId}`);
+      this.$router.push(`/${this.postStore.currentYear}/post/${postId}`);
     },
     createPost() {
       this.$router.push("/createPost");
