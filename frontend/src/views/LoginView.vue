@@ -31,12 +31,17 @@
         </div>
       </div>
     </div>
+    <div v-if="loading" class="overlay">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
   </main>
 </template>
 
 <script>
 import { useCounterStore } from '../stores/counter';
-import Navbar from '../components/NavBarComponent.vue'
+import Navbar from '../components/NavBarComponent.vue';
 import api from '../api';
 import axios from 'axios';
 import csrf from '@/csrf';
@@ -54,10 +59,13 @@ export default {
         password: '',
         remember: false,
       },
+      loading: false,
     }
   },
   methods: {
     login() {
+      this.loading = true;
+
       csrf.get('/sanctum/csrf-cookie')
         .then(() => {
           return this.counter.login(this.creds)
@@ -72,10 +80,28 @@ export default {
         .catch(() => {
           alert('Chyba pri prihlasovaní')
         })
+        .finally(() => {
+          this.loading = false;
+        })
     }
   }
-
 
 }
 
 </script>
+
+<style>
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+</style>
+

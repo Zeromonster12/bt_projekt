@@ -3,32 +3,20 @@
     <div class="sidebar-heading border-bottom bg-light text-center">Menu</div>
     <div class="list-group list-group-flush">
       <div class="p-3 text-center">
-        <button class="btn btn-success" @click="createPost" v-if="isLoggedIn">
+        <button class="btn btn-success" @click="createPost" v-if="isEditor">
           <font-awesome-icon icon="plus" /> Create Post
         </button>
       </div>
-      <div
-        class="list-group-item list-group-item-action list-group-item-light p-3"
-        v-for="post in postStore.filteredPosts"
-        :key="post.id"
-        :class="{ active: post.id === activePostId }"
-        @click="goToPost(post.id)"
-      >
+      <div class="list-group-item list-group-item-action list-group-item-light p-3"
+        v-for="post in postStore.filteredPosts" :key="post.id" :class="{ active: post.id === activePostId }"
+        @click="goToPost(post.id)">
         <span>{{ post.title }}</span>
 
-        <button
-          class="btn btn-sm btn-outline-primary ms-2"
-          @click.stop="editPost(post.id)"
-          v-if="isLoggedIn"
-        >
+        <button class="btn btn-sm btn-outline-primary ms-2" @click.stop="editPost(post.id)" v-if="isEditor">
           <font-awesome-icon icon="edit" />
         </button>
 
-        <button
-          class="btn btn-sm btn-outline-danger ms-2"
-          @click.stop="deletePost(post.id)"
-          v-if="isLoggedIn"
-        >
+        <button class="btn btn-sm btn-outline-danger ms-2" @click.stop="deletePost(post.id)" v-if="isEditor">
           <font-awesome-icon icon="trash" />
         </button>
       </div>
@@ -39,20 +27,23 @@
 <script>
 import { usePostStore } from "@/stores/postStore";
 import { useCounterStore } from "@/stores/counter";
-
 export default {
   name: "SideBarComponent",
+  data() {
+    return {
+      counter: useCounterStore(),
+    }
+  },
   computed: {
     postStore() {
       return usePostStore();
     },
-    isLoggedIn() {
-      const counterStore = useCounterStore();
-      return !!counterStore.token;
-    },
     activePostId() {
       return parseInt(this.$route.params.id);
     },
+    isEditor() {
+      return this.counter.user?.role_id == 2 || this.counter.user?.role_id == 3
+    }
   },
   watch: {
     $route: {
@@ -83,6 +74,4 @@ export default {
 };
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

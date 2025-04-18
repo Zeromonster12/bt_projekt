@@ -14,10 +14,6 @@ const router = createRouter({
       component: HomeView,
       children: [
         {
-          path: '',
-          redirect: '/2025/post/1',
-        },
-        {
           path: ':year/post/:id',
           name: 'PostView',
           component: PostView,

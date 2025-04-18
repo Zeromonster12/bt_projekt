@@ -51,7 +51,7 @@ class PostController extends Controller
             'title' => $request->input('title'),
             'body' => $request->input('body'),
             'image' => $request->input('image'),
-            'user_id' => 2,
+            'user_id' => $request->input('user_id'),
             'year_id' => 2,
         ]);
 
@@ -85,6 +85,14 @@ class PostController extends Controller
                 return response()->json(['message' => 'Post not found'], 404);
             }
         
+            return response()->json($post, 200);
+        }
+    
+        public function newestPost(){
+            $post = Post::join('years', 'posts.year_id', '=', 'years.id')
+                ->orderBy('posts.created_at', 'desc')
+                ->select('posts.*', 'years.year')
+                ->first();
             return response()->json($post, 200);
         }
 }

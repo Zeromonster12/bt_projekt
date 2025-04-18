@@ -15,6 +15,7 @@ export const useCounterStore = defineStore('counter', {
         const response = await api.post('/login', creds);
         this.token = response.data.token;
         api.defaults.headers.common['Authorization'] = `Bearer ${this.token}`;
+        sessionStorage.setItem('token', response.data.token)
         await this.fetchUser();
         return true;
       } catch (error) {

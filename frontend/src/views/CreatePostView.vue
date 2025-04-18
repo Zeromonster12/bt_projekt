@@ -64,6 +64,7 @@ export default {
           title: this.title,
           body: this.content,
           image: this.image,
+          user_id: this.user.id,
         });
         alert(response.data.message);
         this.$router.push("/");

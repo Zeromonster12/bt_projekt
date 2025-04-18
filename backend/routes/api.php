@@ -14,11 +14,12 @@ Route::get('/user', function (Request $request) {
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/createPost', [PostController::class, 'create']);
     Route::get('/deletePost/{id}', [PostController::class, 'destroy']);
+    Route::Get('/newestPost', [PostController::class, 'newestPost']);
 });
 
 
 //TODO: LOGIN
-Route::post('/login', [UserController::class, 'login'])->name('login');
+Route::post('/login', [UserController::class, 'login']);
 Route::get('/posts', [PostController::class, 'index']);
 Route::get('/searchPost', [PostController::class, 'show']);
 Route::get('/post/{id}', [PostController::class, 'getPostById']);
