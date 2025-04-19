@@ -27,7 +27,6 @@
             <router-link class="nav-link" to="/">Contact</router-link>
           </li>
         </ul>
-        <span>Používateľ: {{ counter.user?.name }}</span>
         <form class="d-flex me-2" @submit.prevent="searchPosts">
           <input
             class="form-control"
@@ -40,12 +39,36 @@
             <font-awesome-icon icon="search" />
           </button>
         </form>
-        <router-link v-if="!user" to="/login" class="btn btn-outline-primary">
+
+        <div v-if="user" class="dropdown">
+          <div
+            class="profile-circle"
+            id="profileDropdown"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            <font-awesome-icon icon="user-circle" size="2x" />
+          </div>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+            <li>
+              <div class="dropdown-item user-profile-header py-2 border-bottom">
+                <span class="fw-bold">{{ user.name }}</span>
+              </div>
+            </li>
+            <li>
+              <router-link class="dropdown-item" to="/profile">Profile Settings</router-link>
+            </li>
+            <li>
+              <router-link class="dropdown-item" to="/user-management">User Management</router-link>
+            </li>
+            <li>
+              <button class="dropdown-item" @click="logout">Logout</button>
+            </li>
+          </ul>
+        </div>
+        <router-link v-else to="/login" class="btn btn-outline-primary">
           <font-awesome-icon icon="sign-in-alt" /> Login
         </router-link>
-        <button v-if="user" class="btn btn-outline-danger ms-2" @click="logout">
-          <font-awesome-icon icon="sign-out-alt" /> Logout
-        </button>
       </div>
     </div>
   </nav>
@@ -86,3 +109,25 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.profile-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+}
+
+.profile-circle:hover {
+  background-color: #e0e0e0;
+}
+
+.dropdown-menu {
+  min-width: 200px;
+}
+</style>

@@ -33,6 +33,7 @@ export const useCounterStore = defineStore('counter', {
     logout() {
       this.token = null;
       this.user = null;
+      sessionStorage.removeItem('token')
       delete api.defaults.headers.common['Authorization'];
     }
   },

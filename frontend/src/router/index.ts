@@ -5,6 +5,8 @@ import PostView from '../views/PostView.vue';
 import CreatePostView from '../views/CreatePostView.vue';
 import EditPostView from '../views/EditPostView.vue';
 import SearchView from '../views/SearchView.vue';
+import ProfileView from '../views/ProfileView.vue';
+import UserManagementView from '../views/UserManagementView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -40,7 +42,17 @@ const router = createRouter({
       path: '/search',
       name: 'Search',
       component: SearchView,
-    }
+    },
+    {
+      path: '/profile',
+      name: 'Profile',
+      component: ProfileView,
+    },
+    {
+      path: '/user-management',
+      name: 'UserManagement',
+      component: UserManagementView,
+    },
 
   ],
 });

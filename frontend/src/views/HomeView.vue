@@ -4,7 +4,6 @@
       <Navbar class="top-navbar" />
       <YearBar class="year-bar" @year-selected="postStore.filterPostsByYear" />
       <div class="content-wrapper">
-        <h1>{{ user }}</h1>
         <Sidebar
           class="left-sidebar"
           :posts="postStore.filteredPosts"
