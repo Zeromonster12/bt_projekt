@@ -1,33 +1,26 @@
 <template>
   <div>
-    <div v-if="errorMessage">
-      <p class="error">{{ errorMessage }}</p>
-    </div>
-    <div v-else-if="post">
+    <h1>Post Details</h1>
+    <div v-if="post" class="post-details">
       <h2>{{ post.title }}</h2>
-      <p>{{ post.body }}</p>
+      <p>{{ post.content }}</p>
+      <img v-if="post.image" :src="post.image" alt="Post Image" />
+      <p><strong>Created At:</strong> {{ post.created_at }}</p>
+      <p><strong>Updated At:</strong> {{ post.updated_at }}</p>
+      <p><strong>Year:</strong> {{ post.year }}</p>
+      <p><strong>User ID:</strong> {{ post.user_id }}</p>
+      <p><strong>Year ID:</strong> {{ post.year_id }}</p>
+      <p><strong>ID:</strong> {{ post.id }}</p>
     </div>
-    <div v-else>
-      <p>Loading post...</p>
-    </div>
+    <div v-else class="loading">Loading...</div>
   </div>
 </template>
 
 <script>
-import { usePostStore } from "../stores/postStore";
+import { usePostStore } from "@/stores/postStore";
 
 export default {
   name: "PostView",
-  props: {
-    id: {
-      type: String,
-      required: true,
-    },
-    year: {
-      type: String,
-      required: true,
-    },
-  },
   computed: {
     post() {
       return this.postStore.selectedPost;
@@ -36,25 +29,15 @@ export default {
   data() {
     return {
       postStore: usePostStore(),
-      errorMessage: "",
     };
   },
   watch: {
-    id: {
+    "$route.params.postId": {
       immediate: true,
-      async handler(newId) {
-        this.errorMessage = "";
-        const year = parseInt(this.year);
-
-        const validation = await this.postStore.validatePost(newId, year);
-        if (!validation.valid) {
-          this.errorMessage = validation.message;
-        }
+      handler(newPostId) {
+        this.postStore.fetchPost(parseInt(newPostId));
       },
     },
   },
 };
 </script>
-
-<style scoped>
-</style>

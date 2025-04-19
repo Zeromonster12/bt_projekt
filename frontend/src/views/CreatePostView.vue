@@ -1,4 +1,5 @@
 <template>
+  <NavBar />
   <div class="create-post container mt-5">
     <h1 class="mb-4">Create New Post ROLE: {{ user?.role_id }}</h1>
     <form @submit.prevent="submitPost">
@@ -45,9 +46,13 @@
 <script>
 import api from "@/api";
 import { useCounterStore } from "@/stores/counter";
+import NavBar from "@/components/NavBarComponent.vue";
 
 export default {
   name: "CreatePostView",
+  components: {
+    NavBar,
+  },
   data() {
     return {
       title: "",

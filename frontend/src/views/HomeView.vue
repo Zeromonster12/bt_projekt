@@ -2,12 +2,11 @@
   <main>
     <div class="app-container">
       <Navbar class="top-navbar" />
-      <YearBar class="year-bar" @year-selected="postStore.filterPostsByYear" />
       <div class="content-wrapper">
         <Sidebar
           class="left-sidebar"
           :posts="postStore.filteredPosts"
-          :currentYear="postStore.currentYear"
+          :currentYear="currentYear"
           @post-deleted="postStore.handlePostDeleted"
         />
         <main class="main-content">
@@ -25,8 +24,6 @@
 import Navbar from "../components/NavBarComponent.vue";
 import Sidebar from "../components/SideBarComponent.vue";
 import Footer from "../components/FooterComponent.vue";
-import YearBar from "../components/YearBarComponent.vue";
-import api from "../api";
 import { usePostStore } from "../stores/postStore";
 
 export default {
@@ -35,12 +32,24 @@ export default {
     Navbar,
     Sidebar,
     Footer,
-    YearBar,
   },
   data() {
     return {
       postStore: usePostStore(),
     };
+  },
+  computed: {
+    currentYear() {
+      return parseInt(this.$route.params.year) || new Date().getFullYear();
+    },
+  },
+  watch: {
+    currentYear: {
+      immediate: true,
+      handler(newYear) {
+        this.postStore.filterPostsByYear(newYear);
+      },
+    },
   },
   mounted() {
     this.postStore.fetchPosts();

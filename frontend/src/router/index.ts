@@ -12,24 +12,21 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/',
+      path: "/",
+      name: "Home",
       component: HomeView,
+    },
+    {
+      path: "/:year",
+      name: "Year",
+      component: HomeView,
+      props: true,
       children: [
         {
-          path: ':year/post/:id',
-          name: 'PostView',
+          path: "post/:postId",
+          name: "Post",
           component: PostView,
           props: true,
-        },
-        {
-          path: 'createPost',
-          name: 'createPost',
-          component: CreatePostView,
-        },
-        {
-          path: 'editPost/:id',
-          name: 'editPost',
-          component: EditPostView,
         },
       ],
     },
@@ -52,6 +49,16 @@ const router = createRouter({
       path: '/user-management',
       name: 'UserManagement',
       component: UserManagementView,
+    },
+    {
+      path: '/createPost',
+      name: 'CreatePost',
+      component: CreatePostView,
+    },
+    {
+      path: '/editPost/:id',
+      name: 'EditPost',
+      component: EditPostView,
     },
 
   ],
