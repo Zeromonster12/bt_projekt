@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
 use Illuminate\Http\Request;
 use App\Models\Post;
 
@@ -9,34 +10,49 @@ use App\Models\Post;
 class PostController extends Controller
 {
     public function index()
-    {
-        return Post::select('image', 'title', 'body')->get();
-    }
+        {
+            return Post::select('posts.id', 'posts.title', 'posts.body', 'years.year')
+                ->join('years', 'posts.year_id', '=', 'years.id')
+                ->get();
+        }
 
     public function show(Request $request)
     {
         $q = $request->input('phrase');
         $posts = Post::query()
+            ->join('years', 'posts.year_id', '=', 'years.id')
             ->where(function ($query) use ($q) {
-                $query->where('title', 'LIKE', "%{$q}%")
-                      ->orWhere('body', 'LIKE', "%{$q}%");
+                $query->where('posts.title', 'LIKE', "%{$q}%")
+                      ->orWhere('posts.body', 'LIKE', "%{$q}%");
             })
+            ->select('posts.id', 'posts.image', 'posts.title', 'posts.body', 'years.year')
             ->get();
-
+    
         if ($posts->isEmpty()) {
             return response()->json(['message' => 'Post sa nenašiel'], 404);
         }
-
+    
         return response()->json($posts, 200);
     }
 
     public function create(Request $request)
     {
+
+
+        $user = Auth::user();
+
+        if(!$user) {
+            return response()->json(['message' => 'Neprihlásený používatel - POSTCONTROLLER'], 401); 
+        }
+
+        $role = $user->role_name;
+
         $post = Post::create([
             'title' => $request->input('title'),
             'body' => $request->input('body'),
             'image' => $request->input('image'),
-            'user_id' => 1
+            'user_id' => $request->input('user_id'),
+            'year_id' => 2,
         ]);
 
 
@@ -45,7 +61,6 @@ class PostController extends Controller
 
     public function destroy(string $id)
     {
-
         $post = Post::find($id);
 
         if (!$post) {
@@ -58,4 +73,26 @@ class PostController extends Controller
 
         return response()->json(['message' => 'Post sa odstranil'], 200);
     }
+
+    public function getPostById($id)
+        {
+            $post = Post::join('years', 'posts.year_id', '=', 'years.id')
+                ->where('posts.id', $id)
+                ->select('posts.*', 'years.year')
+                ->first();
+        
+            if (!$post) {
+                return response()->json(['message' => 'Post not found'], 404);
+            }
+        
+            return response()->json($post, 200);
+        }
+    
+        public function newestPost(){
+            $post = Post::join('years', 'posts.year_id', '=', 'years.id')
+                ->orderBy('posts.created_at', 'desc')
+                ->select('posts.*', 'years.year')
+                ->first();
+            return response()->json($post, 200);
+        }
 }

@@ -1,24 +1,61 @@
-<script setup lang="ts">
-import Navbar from '../components/NavBarComponent.vue'
-import Sidebar from '../components/SideBarComponent.vue'
-import Footer from '../components/FooterComponent.vue'
-</script>
-
 <template>
   <main>
-      <div class="app-container">
+    <div class="app-container">
       <Navbar class="top-navbar" />
-      
       <div class="content-wrapper">
-        <Sidebar class="left-sidebar" />
+        <Sidebar
+          class="left-sidebar"
+          :posts="postStore.filteredPosts"
+          :currentYear="currentYear"
+          @post-deleted="postStore.handlePostDeleted"
+        />
         <main class="main-content">
-          <RouterView />
+          <router-view />
         </main>
       </div>
     </div>
-
     <footer class="footer">
       <Footer />
     </footer>
   </main>
 </template>
+
+<script>
+import Navbar from "../components/NavBarComponent.vue";
+import Sidebar from "../components/SideBarComponent.vue";
+import Footer from "../components/FooterComponent.vue";
+import { usePostStore } from "../stores/postStore";
+
+export default {
+  name: "HomeView",
+  components: {
+    Navbar,
+    Sidebar,
+    Footer,
+  },
+  data() {
+    return {
+      postStore: usePostStore(),
+    };
+  },
+  computed: {
+    currentYear() {
+      return parseInt(this.$route.params.year) || new Date().getFullYear();
+    },
+  },
+  watch: {
+    currentYear: {
+      immediate: true,
+      handler(newYear) {
+        this.postStore.filterPostsByYear(newYear);
+      },
+    },
+  },
+  mounted() {
+    this.postStore.fetchPosts();
+  },
+};
+</script>
+
+<style scoped>
+</style>
