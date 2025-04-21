@@ -36,28 +36,24 @@ class PostController extends Controller
     }
 
     public function create(Request $request)
-    {
+{
+    $user = Auth::user();
 
-
-        $user = Auth::user();
-
-        if(!$user) {
-            return response()->json(['message' => 'Neprihlásený používatel - POSTCONTROLLER'], 401); 
-        }
-
-        $role = $user->role_name;
-
-        $post = Post::create([
-            'title' => $request->input('title'),
-            'body' => $request->input('body'),
-            'image' => $request->input('image'),
-            'user_id' => $request->input('user_id'),
-            'year_id' => 2,
-        ]);
-
-
-        return response()->json(['message' => 'Post sa vytvoril'], 201);
+    if (!$user) {
+        return response()->json(['message' => 'Neprihlásený používateľ'], 401);
     }
+
+    $post = Post::create([
+        'title' => $request->input('title'),
+        'body' => $request->input('body'),
+        'image' => $request->input('image'),
+        'user_id' => $user->id,
+        'year_id' => 2, 
+    ]);
+
+    return response()->json(['message' => 'Post sa vytvoril'], 201);
+}
+
 
     public function destroy(string $id)
     {
