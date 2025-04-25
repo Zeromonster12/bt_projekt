@@ -14,7 +14,10 @@ Route::get('/user', function (Request $request) {
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/createPost', [PostController::class, 'create']);
     Route::get('/deletePost/{id}', [PostController::class, 'destroy']);
-    Route::Get('/newestPost', [PostController::class, 'newestPost']);
+    Route::get('/newestPost', [PostController::class, 'newestPost']);
+    Route::get('/fetchUsers', [UserController::class, 'fetchUsers']);
+    Route::post('/updateUser', [UserController::class, 'updateUser']);
+    Route::get('/years', [YearController::class, 'index']);
 });
 
 

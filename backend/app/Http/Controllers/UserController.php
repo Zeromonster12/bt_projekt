@@ -20,13 +20,14 @@ class UserController extends Controller {
         return response()->json(['message' => 'User deleted successfully']);
     }
 
-    public function updateUser(Request $request, User $user) {
-        $user->update($request->only(['name', 'surname', 'email', 'password']));
-        if ($request->has('role')) {
-            $role = Role::where('name', $request->input('role'))->firstOrFail();
-            $user->roles()->sync([$role->id]);
+    public function updateUser(Request $request) {
+        try {
+            $user = User::findOrFail($request->id);
+            $user->update($request->only(['name', 'email', 'role_id', 'years']));
+            return response()->json(['message' => 'User updated successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to update user', 'details' => $e->getMessage()], 500);
         }
-        return response()->json(['message' => 'User updated successfully']);
     }
 
     public function login(Request $request) {
@@ -56,5 +57,11 @@ class UserController extends Controller {
         $request->user()->currentAccessToken()->delete();
 
         return response()->json(['message' => 'Úspešné odhlásenie']);
+    }
+
+    public function fetchUsers() {
+        $users = User::all();
+
+        return response()->json($users);
     }
 }

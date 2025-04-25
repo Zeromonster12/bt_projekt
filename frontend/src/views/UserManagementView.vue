@@ -11,16 +11,11 @@
             <span class="input-group-text">
               <i class="bi bi-search"></i>
             </span>
-            <input 
-              type="text" 
-              class="form-control" 
-              placeholder="Search by name..." 
-              v-model="searchQuery"
-            >
+            <input type="text" class="form-control" placeholder="Search by name..." v-model="searchQuery">
           </div>
         </div>
       </div>
-      
+
       <div class="table-responsive">
         <table class="table table-striped table-bordered" ref="userTable">
           <thead class="table-dark">
@@ -40,9 +35,12 @@
               <td>{{ user.email }}</td>
               <td>
                 <span class="badge" :class="{
-                  'bg-danger': user.role === 'Admin',
-                  'bg-success': user.role === 'Editor'
-                }">{{ user.role }}</span>
+                  'bg-danger': user.role_id === 1,
+                  'bg-success': user.role_id === 2,
+                  'bg-info': user.role_id === 3
+                }">
+                  {{ user.role_id === 3 ? 'Anonym' : user.role_id === 2 ? 'Editor' : 'Admin' }}
+                </span>
               </td>
               <td>
                 <span>
@@ -53,10 +51,9 @@
                 </span>
               </td>
               <td>
-                <button class="btn btn-sm btn-primary me-1" @click="editUser(user.id)">
+                <button class="btn btn-sm btn-primary me-1" data-bs-toggle="modal" data-bs-target="#editUserModal" @click="editUser(user)">
                   <i class="bi bi-pencil"></i> Edit
                 </button>
-                
                 <button class="btn btn-sm btn-danger" @click="deleteUser(user.id)">
                   <i class="bi bi-trash"></i> Delete
                 </button>
@@ -68,50 +65,79 @@
           </tbody>
         </table>
       </div>
+      <div class="modal fade" id="editUserModal" ref="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <input type="text" class="form-control mb-2" v-model="selectedUser.name" placeholder="Name">
+              <input type="email" class="form-control mb-2" v-model="selectedUser.email" placeholder="Email">
+              <select class="form-select mb-2" v-model="selectedUser.role_id">
+                <option :value="1">Admin - 1</option>
+                <option :value="2">Editor - 2</option>
+              </select>
+              <div class="mb-2">
+                <label class="form-label">Years</label>
+                <select multiple class="form-select" v-model="selectedUser.years" size="5">
+                  <option v-for="year in store.years" :key="year.id" :value="year.id">{{ year.year }}</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button class="btn btn-primary" @click="saveUser">Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import NavBar from "@/components/NavBarComponent.vue";
+import { useUserStore } from "@/stores/userStore";
 
 export default {
   name: "UserManagementView",
-  components: {
-    NavBar,
-  },
+  components: { NavBar },
   data() {
     return {
-      users: [
-        { id: 1, name: "John Doe", email: "john@example.com", role: "Admin", years: [2025, 2024, 2023, 2022, 2021, 2020] },
-        { id: 2, name: "Jane Smith", email: "jane@example.com", role: "Editor", years: [2025, 2024, 2023] },
-        { id: 3, name: "Alice Johnson", email: "alice@example.com", role: "Editor", years: [2025, 2024, 2022, 2020] },
-        { id: 4, name: "Robert Williams", email: "robert@example.com", role: "Editor", years: [2023, 2022, 2021] },
-        { id: 5, name: "Emily Brown", email: "emily@example.com", role: "Editor", years: [2024, 2023, 2022, 2021, 2020] },
-        { id: 6, name: "Michael Davis", email: "michael@example.com", role: "Admin", years: [2025, 2024] },
-      ],
+      store: useUserStore(),
       searchQuery: "",
       maxYearsToShow: 5,
+      selectedUser: { id: null, name: "", email: "", role_id: null, years: null }
     };
   },
   computed: {
     filteredUsers() {
-      return this.users.filter((user) =>
-        user.name.toLowerCase().includes(this.searchQuery.toLowerCase())
-      );
+      return this.store.users.filter((user) => user.name.toLowerCase().includes(this.searchQuery.toLowerCase()));
     },
   },
   methods: {
     addUser() {
       alert("Add User functionality not implemented yet.");
     },
-    editUser(userId) {
-      alert(`Edit User functionality for user ID ${userId} not implemented yet.`);
+    editUser(user) {
+      this.selectedUser = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role_id: user.role_id,
+        years: [...user.years],
+      };
+    },
+    saveUser() {
+      this.store.editedUsers = this.selectedUser;
+      this.store.updateUsers();
     },
     deleteUser(userId) {
       const confirmed = confirm(`Are you sure you want to delete user ID ${userId}?`);
       if (confirmed) {
-        this.users = this.users.filter((user) => user.id !== userId);
+        this.store.users = this.store.users.filter((user) => user.id !== userId);
       }
     },
     updateMaxYearsToShow() {
@@ -123,15 +149,11 @@ export default {
   mounted() {
     this.updateMaxYearsToShow();
     window.addEventListener("resize", this.updateMaxYearsToShow);
+    this.store.fetchUsers();
+    this.store.fetchYears();
   },
   beforeUnmount() {
     window.removeEventListener("resize", this.updateMaxYearsToShow);
   },
 };
 </script>
-
-<style>
-.container {
-  max-width: 80%;
-}
-</style>

@@ -5,6 +5,7 @@ import { useCounterStore } from './stores/counter'
 export default {
   data() {
     return {
+      userID: null,
       user: null,
       counter: useCounterStore(),
       loading: false,
