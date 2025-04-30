@@ -6,10 +6,10 @@
         <div class="card">
           <div class="card-body text-center">
             <img src="https://via.placeholder.com/150" class="rounded-circle mb-3" alt="Profile Picture">
-            <h3 class="card-title">John Doe</h3>
-            <p class="text-muted">Web Developer</p>
+            <h3 class="card-title">{{ profile.name }}</h3>
+            <p class="text-muted">{{ profile.role_id }}</p>
             <div class="d-grid gap-2">
-              <button class="btn btn-primary">Edit Profile</button>
+              <button class="btn btn-primary" @click="editProfile">Edit Profile</button>
             </div>
           </div>
         </div>
@@ -24,7 +24,7 @@
                 <h6 class="mb-0">Full Name</h6>
               </div>
               <div class="col-sm-9 text-secondary">
-                John Doe
+                {{ profile.name }}
               </div>
             </div>
             <div class="row mb-3">
@@ -32,23 +32,7 @@
                 <h6 class="mb-0">Email</h6>
               </div>
               <div class="col-sm-9 text-secondary">
-                john.doe@example.com
-              </div>
-            </div>
-            <div class="row mb-3">
-              <div class="col-sm-3">
-                <h6 class="mb-0">Phone</h6>
-              </div>
-              <div class="col-sm-9 text-secondary">
-                (123) 456-7890
-              </div>
-            </div>
-            <div class="row mb-3">
-              <div class="col-sm-3">
-                <h6 class="mb-0">Address</h6>
-              </div>
-              <div class="col-sm-9 text-secondary">
-                123 Main St, City, Country
+                {{ profile.email }}
               </div>
             </div>
           </div>
@@ -59,34 +43,60 @@
 </template>
 
 <script>
+import api from "@/api";
 import NavBar from "@/components/NavBarComponent.vue";
+import axios from "axios";
+
 export default {
   name: "ProfileView",
   components: {
     NavBar,
   },
-  created() {},
   data() {
     return {
       profile: {
-        name: "John Doe",
-        role: "Web Developer",
-        email: "john.doe@example.com",
-        phone: "(123) 456-7890",
-        address: "123 Main St, City, Country"
-      }
+        name: null,
+        role_id: null, // Môžete pridať rolu, ak je dostupná
+        email: "",
+      },
     };
   },
-  props: {},
+  created() {
+    this.fetchProfile();
+  },
   methods: {
+    async fetchProfile() {
+  // Debug: Výpis tokenu
+  const token = sessionStorage.getItem('token');
+  console.log('Token z localStorage:', token); // Debug
+  
+  try {
+    const response = await api.get("/profile");
+    this.profile = {
+      name: response.data.name,
+      email: response.data.email,
+      role_id: response.data.role_id, // Pridajte rolu, ak je dostupná
+    };
+  } catch (error) {
+    console.error('Detail chyby:', {
+      status: error.response?.status,
+      data: error.response?.data,
+      headers: error.response?.headers
+    });
+    
+    this.profile = {
+      name: "Neprihlásený používateľ",
+      email: "N/A"
+    };
+  }
+},
     editProfile() {
-      // Add edit profile functionality here
       console.log("Edit profile clicked");
-    }
+    },
   },
 };
 </script>
 
 <style lang="css" scoped>
-
+/* Pridajte vlastné štýly, ak je to potrebné */
 </style>

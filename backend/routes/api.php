@@ -7,6 +7,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\YearController;
 
+Route::middleware('auth:sanctum')->get('/profile', function (Request $request) {
+    return response()->json([
+        'name' => $request->user()->name,
+        'email' => $request->user()->email,
+        'role_id' => $request->user()->role_id,
+    ]);
+});
+
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
