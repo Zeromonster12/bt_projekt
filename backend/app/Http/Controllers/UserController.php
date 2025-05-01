@@ -5,6 +5,7 @@ use App\Models\User;
 use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Auth;
 
 class UserController extends Controller {
     public function createUser(Request $request) {
@@ -28,6 +29,28 @@ class UserController extends Controller {
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to update user', 'details' => $e->getMessage()], 500);
         }
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $user = Auth::user();
+
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'password' => 'nullable|string|min:8',
+        ]);
+
+        $user->name = $validatedData['name'];
+        $user->email = $validatedData['email'];
+
+        if (!empty($validatedData['password'])) {
+            $user->password = bcrypt($validatedData['password']);
+        }
+
+        $user->save();
+
+        return response()->json($user, 200);
     }
 
     public function login(Request $request) {
