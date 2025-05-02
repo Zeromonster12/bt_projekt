@@ -21,6 +21,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+<<<<<<< Updated upstream
+=======
+        'role_id',
+>>>>>>> Stashed changes
     ];
 
     /**
@@ -45,4 +49,17 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+<<<<<<< Updated upstream
+=======
+
+    public function roles() {
+        return $this->belongsTo(Role::class, 'role_id');
+    }
+
+    public function years() {
+        return $this->belongsToMany(Year::class, 'user_year');
+    }
+
+
+>>>>>>> Stashed changes
 }

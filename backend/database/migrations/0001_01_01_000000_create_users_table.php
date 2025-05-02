@@ -16,7 +16,10 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
+<<<<<<< Updated upstream:backend/database/migrations/0001_01_01_000000_create_users_table.php
             $table->string('password');
+=======
+>>>>>>> Stashed changes:backend/database/migrations/2025_04_12_000000_create_users_table.php
             $table->rememberToken();
             $table->timestamps();
         });

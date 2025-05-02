@@ -15,9 +15,24 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
+<<<<<<< Updated upstream
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
+=======
+        User::factory()
+            ->has(Year::factory()->count(4))
+            ->create([
+                'name' => 'Admin',
+                'email' => 'te@te.com',
+                'role_id' => 1,
+            ]);
+
+        Post::factory()->create([
+            'title' => 'Test Post',
+            'body' => 'This is a test post.',
+            'user_id' => 1
+>>>>>>> Stashed changes
         ]);
     }
 }
