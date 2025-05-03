@@ -1,6 +1,6 @@
 <template>
   <div class="sidebar border-end" id="sidebar-wrapper">
-    <div class="sidebar-heading border-bottom bg-light text-center">Menu</div>
+    <div class="sidebar-heading text-center">Menu</div>
 
     <div v-if="!currentYear" class="list-group list-group-flush">
       <div
