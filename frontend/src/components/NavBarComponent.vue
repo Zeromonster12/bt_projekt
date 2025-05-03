@@ -63,6 +63,9 @@
               <router-link class="dropdown-item py-2" to="/user-management">User Management</router-link>
             </li>
             <li>
+              <router-link class="dropdown-item py-2" to="/year-management">Year Management</router-link>
+            </li>
+            <li>
                 <button class="dropdown-item logout-btn mt-3 py-2" @click="logout">
                 <font-awesome-icon icon="sign-out-alt" /> Logout
                 </button>

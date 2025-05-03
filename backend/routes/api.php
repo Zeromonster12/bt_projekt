@@ -27,6 +27,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/fetchUsers', [UserController::class, 'fetchUsers']);
     Route::post('/updateUser', [UserController::class, 'updateUser']);
     Route::get('/years', [YearController::class, 'index']);
+    Route::post('/years', [YearController::class, 'store']);
+    Route::put('/years/{id}', [YearController::class, 'update']);
+    Route::delete('/years/{id}', [YearController::class, 'destroy']);
 });
 
 

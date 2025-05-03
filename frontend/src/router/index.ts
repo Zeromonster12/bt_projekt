@@ -6,7 +6,8 @@ import CreatePostView from '../views/CreatePostView.vue';
 import EditPostView from '../views/EditPostView.vue';
 import SearchView from '../views/SearchView.vue';
 import ProfileView from '../views/ProfileView.vue';
-import UserManagementView from '../views/UserManagementView.vue'
+import UserManagementView from '../views/UserManagementView.vue';
+import YearManagementView from '../views/YearManagementView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -49,6 +50,11 @@ const router = createRouter({
       path: '/user-management',
       name: 'UserManagement',
       component: UserManagementView,
+    },
+    {
+      path: '/year-management',
+      name: 'YearManagement',
+      component: YearManagementView,
     },
     {
       path: '/createPost',
