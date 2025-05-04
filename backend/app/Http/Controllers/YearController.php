@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Year;
 use Illuminate\Http\Request;
-use Illuminate\Database\QueryException; // Import this class
+use Illuminate\Database\QueryException;
 
 class YearController extends Controller
 {

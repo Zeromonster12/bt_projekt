@@ -30,6 +30,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/years', [YearController::class, 'store']);
     Route::put('/years/{id}', [YearController::class, 'update']);
     Route::delete('/years/{id}', [YearController::class, 'destroy']);
+    Route::post('/createUser', [UserController::class, 'createUser']);
+    Route::delete('/deleteUser/{id}', [UserController::class, 'deleteUser']);
 });
 
 
@@ -39,3 +41,6 @@ Route::get('/posts', [PostController::class, 'index']);
 Route::get('/searchPost', [PostController::class, 'show']);
 Route::get('/post/{id}', [PostController::class, 'getPostById']);
 Route::get('/years', [YearController::class, 'index']);
+
+// Testing
+// Route::post('/createYearUser', [YearController::class, 'createYearUser']);

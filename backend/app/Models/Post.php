@@ -14,7 +14,7 @@ class Post extends Model
         'body',
         'image',
         'user_id',
-        'year_id', // Pridajte tento atribút, ak sa používa v továrni
+        'year_id', 
     ];
 
     public function user()

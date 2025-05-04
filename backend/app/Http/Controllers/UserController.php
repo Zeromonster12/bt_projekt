@@ -6,25 +6,50 @@ use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Auth;
+use Str;
 
-class UserController extends Controller {
-    public function createUser(Request $request) {
-        $user = User::create($request->only(['name', 'surname', 'email', 'password']));
-        $role = Role::where('name', $request->input('role'))->firstOrFail();
-        $user->roles()->attach($role->id);
-        return response()->json(['message' => 'User created successfully']);
+class UserController extends Controller
+{
+    public function createUser(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'role_id' => 'required|integer',
+        ]);
+
+        $password = Str::random(8);
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'role_id' => $request->role_id,
+            'password' => Hash::make($password)
+        ]);
+
+        return response()->json(['message' => 'User created successfully with password: ' . $password]);
     }
 
-    public function deleteUser(User $user) {
-        $user->roles()->detach();
+    public function deleteUser($id)
+    {
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
         $user->delete();
-        return response()->json(['message' => 'User deleted successfully']);
+        return response()->json(['message' => 'User deleted successfully'], 200);
     }
 
-    public function updateUser(Request $request) {
+    public function updateUser(Request $request)
+    {
         try {
             $user = User::findOrFail($request->id);
-            $user->update($request->only(['name', 'email', 'role_id', 'years']));
+            $user->update($request->only(['name', 'email', 'role_id']));
+
+            if (isset($request->years)) {
+                $user->years()->sync($request->years);
+            }
+
             return response()->json(['message' => 'User updated successfully']);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to update user', 'details' => $e->getMessage()], 500);
@@ -53,7 +78,8 @@ class UserController extends Controller {
         return response()->json($user, 200);
     }
 
-    public function login(Request $request) {
+    public function login(Request $request)
+    {
         $request->validate([
             'email' => 'required|email',
             'password' => 'required'
@@ -61,7 +87,7 @@ class UserController extends Controller {
 
         $user = User::where('email', $request->email)->first();
 
-        if(!$user || !Hash::check($request->password, $user->password)){
+        if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json(['message' => 'Nesprávne prihlasovacie údaje.'], 401);
         }
 
@@ -76,15 +102,29 @@ class UserController extends Controller {
 
     }
 
-    public function logout(Request $request) {
+    public function logout(Request $request)
+    {
         $request->user()->currentAccessToken()->delete();
 
         return response()->json(['message' => 'Úspešné odhlásenie']);
     }
 
-    public function fetchUsers() {
-        $users = User::all();
+    public function fetchUsers()
+    {
+        $users = User::with('years')->get();
+
+        $users = $users->map(function ($user) {
+            return [
+                'id' => $user->id,
+                'role_id' => $user->role_id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'years' => $user->years->pluck('year')->toArray(), 
+            ];
+        });
 
         return response()->json($users);
     }
+
+
 }

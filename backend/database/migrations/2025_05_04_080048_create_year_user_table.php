@@ -13,10 +13,8 @@ return new class extends Migration
     {
         Schema::create('year_user', function (Blueprint $table) {
             $table->id();
-            $table->string('year')->nullable();
-            $table->foreignId('year_id')->constrained('years', 'id')->onDelete('cascade');
+            $table->foreignId('year_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->timestamps();
         });
     }
 

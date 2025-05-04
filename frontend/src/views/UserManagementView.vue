@@ -3,7 +3,7 @@
     <NavBar />
     <div class="container mt-5">
       <div class="mb-3 d-flex justify-content-between">
-        <button class="btn btn-primary" @click="addUser">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
           <i class="bi bi-plus-circle"></i> Add New User
         </button>
         <div class="search-container" style="width: 300px;">
@@ -65,6 +65,7 @@
           </tbody>
         </table>
       </div>
+      <!-- Edit User Modal - presunuť do componentu -->
       <div class="modal fade" id="editUserModal" ref="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
@@ -93,11 +94,37 @@
           </div>
         </div>
       </div>
+      <!-- End of Edit User Modal -->
+      <!-- User add modal -->
+      <div class="modal fade" id="addUserModal" ref="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="addUserModalLabel">Add User</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <input type="text" class="form-control mb-2" v-model="newUser.name" placeholder="Name">
+              <input type="email" class="form-control mb-2" v-model="newUser.email" placeholder="Email">
+              <select class="form-select mb-2" v-model="newUser.role_id">
+                <option :value="1">Admin - 1</option>
+                <option :value="2">Editor - 2</option>
+              </select>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button class="btn btn-primary" @click="createNewUser">Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End of User add modal -->
     </div>
   </div>
 </template>
 
 <script>
+import api from "@/api";
 import NavBar from "@/components/NavBarComponent.vue";
 import { useUserStore } from "@/stores/userStore";
 
@@ -109,7 +136,8 @@ export default {
       store: useUserStore(),
       searchQuery: "",
       maxYearsToShow: 5,
-      selectedUser: { id: null, name: "", email: "", role_id: null, years: null }
+      selectedUser: { id: null, name: "", email: "", role_id: null, years: null },
+      newUser: { name: "", email: "", role_id: null, years: [] },
     };
   },
   computed: {
@@ -118,8 +146,21 @@ export default {
     },
   },
   methods: {
-    addUser() {
-      alert("Add User functionality not implemented yet.");
+    createNewUser() {
+      if (this.newUser.name && this.newUser.email && this.newUser.role_id) {
+        api.post('/createUser', this.newUser)
+        .then(response => {
+          this.store.users.push(response.data);
+          this.store.fetchUsers();
+        })
+        .catch(error => {
+          console.error("Error creating user:", error);
+          alert("Failed to create user. Please try again.");
+        });
+        this.newUser = { name: "", email: "", role_id: null, years: [] };
+      } else {
+        alert("Please fill in all fields.");
+      }
     },
     editUser(user) {
       this.selectedUser = {
@@ -138,6 +179,7 @@ export default {
       const confirmed = confirm(`Are you sure you want to delete user ID ${userId}?`);
       if (confirmed) {
         this.store.users = this.store.users.filter((user) => user.id !== userId);
+        this.store.deleteUser(userId);
       }
     },
     updateMaxYearsToShow() {
@@ -149,8 +191,8 @@ export default {
   mounted() {
     this.updateMaxYearsToShow();
     window.addEventListener("resize", this.updateMaxYearsToShow);
-    this.store.fetchUsers();
     this.store.fetchYears();
+    this.store.fetchUsers();
   },
   beforeUnmount() {
     window.removeEventListener("resize", this.updateMaxYearsToShow);
