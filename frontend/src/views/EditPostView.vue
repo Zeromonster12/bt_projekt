@@ -36,13 +36,39 @@
 
 <script>
 export default {
-  name: "Test",
-  created() {},
+  name: "EditPostView",
   data() {
-    return {};
+    return {
+      title: "",
+      content: "",
+    };
   },
-  props: {},
-  methods: {},
+  async created() {
+    const postId = this.$route.params.postId;
+    try {
+      const response = await api.get(`/posts/${postId}`);
+      this.title = response.data.title;
+      this.content = response.data.body;
+    } catch (error) {
+      console.error("Error fetching post:", error);
+    }
+  },
+  methods: {
+    async updatePost() {
+      const postId = this.$route.params.postId;
+      try {
+        await api.put(`/posts/${postId}`, {
+          title: this.title,
+          body: this.content,
+        });
+        alert("Post updated successfully!");
+        this.$router.push("/postManagement");
+      } catch (error) {
+        console.error("Error updating post:", error);
+        alert("Failed to update post. Please try again.");
+      }
+    },
+  },
 };
 </script>
 

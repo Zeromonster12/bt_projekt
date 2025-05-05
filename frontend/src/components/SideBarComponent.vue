@@ -34,20 +34,7 @@
       >
         <span style="cursor: pointer;">{{ post.title }}</span>
       
-        <div v-if="isEditor" class="mt-2">
-          <button
-            class="btn btn-sm btn-primary me-2"
-            @click.stop="editPost(post.id)"
-          >
-            <font-awesome-icon icon="edit" /> Edit
-          </button>
-          <button
-            class="btn btn-sm btn-danger"
-            @click.stop="deletePost(post.id)"
-          >
-            <font-awesome-icon icon="trash" /> Delete
-          </button>
-        </div>
+
       </div>
     </div>
   </div>
@@ -99,15 +86,7 @@ export default {
     createPost() {
       this.$router.push("/createPost");
     },
-    editPost(postId) {
-      this.$router.push(`/editPost/${postId}`);
-    },
-    async deletePost(postId) {
-      const confirmed = confirm("Are you sure you want to delete this post?");
-      if (confirmed) {
-        await this.postStore.deletePost(postId);
-      }
-    },
+
     async fetchYears() {
       if (!this.postStore.years.length) {
         await this.postStore.fetchYears();

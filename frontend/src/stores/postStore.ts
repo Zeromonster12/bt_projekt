@@ -12,6 +12,15 @@ export const usePostStore = defineStore('post', {
   }),
 
   actions: {
+    async deletePost(postId) {
+      try {
+        await api.delete(`/posts/${postId}`);
+        this.posts = this.posts.filter((post) => post.id !== postId);
+      } catch (error) {
+        console.error("Error deleting post:", error);
+      }
+    },
+
     async fetchPosts() {
       try {
         const response = await api.get('/posts');
@@ -53,10 +62,10 @@ export const usePostStore = defineStore('post', {
 
     async fetchYearsWithId() {
       try {
-      const response = await api.get('/years');
-      this.yearsWithId = response.data;
+        const response = await api.get('/years');
+        this.yearsWithId = response.data;
       } catch (error) {
-      console.error('Error fetching years with ID:', error);
+        console.error('Error fetching years with ID:', error);
       }
     },
 
