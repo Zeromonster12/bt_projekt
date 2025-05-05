@@ -19,8 +19,8 @@ class PostFactory extends Factory
         return [
             'title' => $this->faker->sentence,
             'body' => $this->faker->paragraph,
-            'user_id' => \App\Models\User::factory(),
-            'year_id' => \App\Models\Year::factory(),
+            'user_id' => $this->faker->numberBetween(1, 3),
+            'year_id' => $this->faker->numberBetween(1, 3),
         ];
     }
 }

@@ -22,6 +22,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role_id',
+        'years'
     ];
 
     /**
@@ -47,8 +49,14 @@ class User extends Authenticatable
         ];
     }
 
-    public function roles() {
+    public function roles()
+    {
         return $this->belongsTo(Role::class, 'role_id');
+    }
+
+    public function years()
+    {
+        return $this->belongsToMany(Year::class, 'year_user', 'user_id', 'year_id');
     }
 
 

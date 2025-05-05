@@ -5,7 +5,7 @@ use App\Models\Year;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Factory>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Year>
  */
 class YearFactory extends Factory
 {
@@ -19,7 +19,6 @@ class YearFactory extends Factory
     {
         return [
             'year' => $this->faker->year,
-            'user_id' => 1,
         ];
     }
 }

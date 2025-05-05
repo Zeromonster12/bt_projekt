@@ -22,30 +22,32 @@ class DatabaseSeeder extends Seeder
             ['name' => 'editor'],
             ['name' => 'anonym'],
         ]);
-        User::factory()->createMany([
+
+
+
+        User::factory()
+        ->has(Year::factory()->count(1))
+        ->createMany([
             [
-                'name' => 'Test User',
+                'role_id' => 1,
+                'name' => 'test user admin',
                 'email' => 'test@example.com',
             ],
             [
-                'name' => 'Test User 2',
-                'email' => 'test2@example.com',
+                'role_id' => 2,
+                'name' => 'test user Editor',
+                'email' => 'editor@example.com',
             ],
             [
-                'name' => 'Test User 3',
-                'email' => 'test3@example.com',
+                'role_id' => 3,
+                'name' => 'test user Anonym',
+                'email' => 'anonym@example.com',
             ],
-        ]);
-
-        Year::factory()->create([
-            'year' => '2023',
-            'user_id' => 1
         ]);
 
         Post::factory()->create([
             'title' => 'Test Post',
             'body' => 'This is a test post.',
-            'user_id' => 1
         ]);
     }
 }

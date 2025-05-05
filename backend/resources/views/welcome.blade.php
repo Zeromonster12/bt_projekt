@@ -35,6 +35,19 @@
         <button type="submit" class="btn btn-primary">Search Post</button>
     </form>
     <br>
+    <form action="/api/createYearUser" method="POST">
+        @csrf
+        <div class="mb-3">
+            <label for="user" class="form-label">User</label>
+            <input type="text" class="form-control" id="id" name="id" required>
+        </div>
+        <div class="mb-3">
+            <label for="year" class="form-label">Year</label>
+            <input type="text" class="form-control" id="id" name="id" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Year User</button>
+    </form>
+    <br>
     @if (isset($posts))
         @foreach ($posts as $post)
             <div class="card mb-3">
@@ -50,3 +63,4 @@
     @endif
 </body>
 </html>
+

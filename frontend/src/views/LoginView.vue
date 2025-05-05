@@ -4,11 +4,11 @@
     <div class="container mt-5">
       <div class="row justify-content-center">
         <div class="col-md-6">
-          <div class="card">
-            <div class="card-header">
-              <h3 class="text-center">Login</h3>
+          <div class="card p-5 shadow-sm border-0 rounded-5">
+            <div class="card-header border-0 bg-transparent"> 
+              <h3 class="text-center mb-0">Login</h3>
             </div>
-            <div class="card-body">
+            <div class="card-body p-5">
               <form @submit.prevent="login">
                 <div class="mb-3">
                   <label for="email" class="form-label">Email address</label>
@@ -23,7 +23,7 @@
                   <label class="form-check-label" for="remember">Remember me</label>
                 </div>
                 <div class="d-grid">
-                  <button type="submit" class="btn btn-primary">Login</button>
+                  <button type="submit" class="btn btn-primary rounded-4 px-3">Login</button>
                 </div>
               </form>
             </div>

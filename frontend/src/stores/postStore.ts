@@ -8,6 +8,7 @@ export const usePostStore = defineStore('post', {
     currentYear: new Date().getFullYear(),
     selectedPost: null,
     years: [],
+    yearsWithId: [],
   }),
 
   actions: {
@@ -47,6 +48,15 @@ export const usePostStore = defineStore('post', {
           .sort((a, b) => b - a);
       } catch (error) {
         console.error('Error fetching years:', error);
+      }
+    },
+
+    async fetchYearsWithId() {
+      try {
+      const response = await api.get('/years');
+      this.yearsWithId = response.data;
+      } catch (error) {
+      console.error('Error fetching years with ID:', error);
       }
     },
 

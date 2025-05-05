@@ -1,6 +1,6 @@
 <template>
   <div class="sidebar border-end" id="sidebar-wrapper">
-    <div class="sidebar-heading border-bottom bg-light text-center">Menu</div>
+    <div class="sidebar-heading text-center">Menu</div>
 
     <div v-if="!currentYear" class="list-group list-group-flush">
       <div
@@ -67,7 +67,7 @@ export default {
   },
   computed: {
     isEditor() {
-      return this.counterStore.user && [2, 3].includes(this.counterStore.user.role_id);
+      return this.counterStore.user && [2, 1].includes(this.counterStore.user.role_id);
     },
     activePostId() {
       return parseInt(this.$route.params.postId);
