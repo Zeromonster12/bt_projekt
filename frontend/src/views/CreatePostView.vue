@@ -1,7 +1,7 @@
 <template>
   <div class="create-post container mt-5">
     <h1 class="mb-4">Create New Post</h1>
-    <form @submit.prevent="submitPost">
+    <div>
       <input
         v-model="title"
         type="text"
@@ -20,11 +20,11 @@
         placeholder="Image URL"
       />
 
-      <button class="btn btn-primary mt-3" :disabled="isSubmitting">
+      <button class="btn btn-primary mt-3" :disabled="isSubmitting" @click="submitPost">
         <span v-if="isSubmitting">Creating...</span>
         <span v-else>Create Post</span>
       </button>
-    </form>
+    </div>
   </div>
 </template>
 
@@ -39,17 +39,24 @@ export default {
       title: "",
       content: "",
       image: "",
-      isSubmitting: false,
+      isSubmitting: false, // Used to disable the button temporarily
     };
   },
   methods: {
     async submitPost() {
-      if (!this.title || !this.content) {
-        alert("Please fill in both title and content.");
+      if (this.isSubmitting) return; // Prevent multiple clicks
+
+      // Validate title and content
+      if (!this.title.trim()) {
+        alert("Please fill in the title.");
+        return;
+      }
+      if (!this.content.trim()) {
+        alert("Please fill in the content.");
         return;
       }
 
-      this.isSubmitting = true;
+      this.isSubmitting = true; // Disable the button
       try {
         const res = await api.post("/createPost", {
           title: this.title,
@@ -63,7 +70,7 @@ export default {
         console.error(err);
         alert("Failed to create post.");
       } finally {
-        this.isSubmitting = false;
+        this.isSubmitting = false; // Re-enable the button
       }
     },
   },

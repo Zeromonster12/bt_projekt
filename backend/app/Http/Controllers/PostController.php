@@ -4,17 +4,17 @@ namespace App\Http\Controllers;
 
 use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage; // Importuj Storage
 use App\Models\Post;
-
 
 class PostController extends Controller
 {
     public function index()
-        {
-            return Post::select('posts.id', 'posts.title', 'posts.body', 'years.year')
-                ->join('years', 'posts.year_id', '=', 'years.id')
-                ->get();
-        }
+    {
+        return Post::select('posts.id', 'posts.title', 'posts.body', 'years.year')
+            ->join('years', 'posts.year_id', '=', 'years.id')
+            ->get();
+    }
 
     public function show(Request $request)
     {
@@ -36,24 +36,23 @@ class PostController extends Controller
     }
 
     public function create(Request $request)
-{
-    $user = Auth::user();
+    {
+        $user = Auth::user();
 
-    if (!$user) {
-        return response()->json(['message' => 'Neprihlásený používateľ'], 401);
+        if (!$user) {
+            return response()->json(['message' => 'Neprihlásený používateľ'], 401);
+        }
+
+        $post = Post::create([
+            'title' => $request->input('title'),
+            'body' => $request->input('body'),
+            'image' => $request->input('image'),
+            'user_id' => $user->id,
+            'year_id' => 2, 
+        ]);
+
+        return response()->json(['message' => 'Post sa vytvoril'], 201);
     }
-
-    $post = Post::create([
-        'title' => $request->input('title'),
-        'body' => $request->input('body'),
-        'image' => $request->input('image'),
-        'user_id' => $user->id,
-        'year_id' => 2, 
-    ]);
-
-    return response()->json(['message' => 'Post sa vytvoril'], 201);
-}
-
 
     public function destroy(string $id)
     {
@@ -71,24 +70,50 @@ class PostController extends Controller
     }
 
     public function getPostById($id)
-        {
-            $post = Post::join('years', 'posts.year_id', '=', 'years.id')
-                ->where('posts.id', $id)
-                ->select('posts.*', 'years.year')
-                ->first();
-        
-            if (!$post) {
-                return response()->json(['message' => 'Post not found'], 404);
-            }
-        
-            return response()->json($post, 200);
+    {
+        $post = Post::join('years', 'posts.year_id', '=', 'years.id')
+            ->where('posts.id', $id)
+            ->select('posts.*', 'years.year')
+            ->first();
+    
+        if (!$post) {
+            return response()->json(['message' => 'Post not found'], 404);
         }
     
-        public function newestPost(){
-            $post = Post::join('years', 'posts.year_id', '=', 'years.id')
-                ->orderBy('posts.created_at', 'desc')
-                ->select('posts.*', 'years.year')
-                ->first();
-            return response()->json($post, 200);
+        return response()->json($post, 200);
+    }
+
+    public function newestPost()
+    {
+        $post = Post::join('years', 'posts.year_id', '=', 'years.id')
+            ->orderBy('posts.created_at', 'desc')
+            ->select('posts.*', 'years.year')
+            ->first();
+        return response()->json($post, 200);
+    }
+
+    public function uploadImage(Request $request)
+    {
+        // Overenie, či bol obrázok odoslaný
+        if (!$request->hasFile('image')) {
+            return response()->json(['message' => 'Žiadny obrázok nebol odoslaný'], 400);
         }
+    
+        // Získame obrázok
+        $image = $request->file('image');
+    
+        // Validácia formátu obrázka
+        $validated = $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Max 2MB
+        ]);
+    
+        // Uložíme obrázok do verejného priečinka
+        $path = $image->store('images', 'public');
+    
+        // Vytvoríme URL obrázka
+        $url = Storage::url($path);
+    
+        // Vrátime URL obrázka ako odpoveď
+        return response()->json(['url' => $url], 200);
+    }
 }

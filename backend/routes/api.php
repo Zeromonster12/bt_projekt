@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\YearController;
 
+
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -14,9 +15,9 @@ Route::get('/user', function (Request $request) {
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/createPost', [PostController::class, 'create']);
     Route::get('/deletePost/{id}', [PostController::class, 'destroy']);
-    Route::Get('/newestPost', [PostController::class, 'newestPost']);
+    Route::get('/newestPost', [PostController::class, 'newestPost']);
+    Route::post('/upload-image', [PostController::class, 'uploadImage']);
 });
-
 
 //TODO: LOGIN
 Route::post('/login', [UserController::class, 'login']);

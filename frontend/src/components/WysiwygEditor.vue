@@ -24,16 +24,17 @@
 import { Editor, EditorContent } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
+import axios from "axios";
 
 export default {
   name: "WysiwygEditor",
+  components: {
+    EditorContent,
+  },
   props: {
     modelValue: String,
   },
   emits: ["update:modelValue"],
-  components: {
-    EditorContent,  // Registrácia komponentu EditorContent
-  },
   data() {
     return {
       editor: null,
@@ -48,37 +49,81 @@ export default {
         this.$emit("update:modelValue", editor.getHTML());
       },
     });
+
+    // Drag and drop support
+    this.$nextTick(() => {
+      const editorElement = this.$el.querySelector(".editor-content");
+      editorElement.addEventListener("drop", this.handleDrop);
+    });
   },
   methods: {
     toggleBold() {
-      if (this.editor) {
-        this.editor.chain().focus().toggleBold().run();
-      }
+      this.editor?.chain().focus().toggleBold().run();
     },
     toggleItalic() {
-      if (this.editor) {
-        this.editor.chain().focus().toggleItalic().run();
-      }
+      this.editor?.chain().focus().toggleItalic().run();
     },
     setHeading(level) {
-      if (this.editor) {
-        this.editor.chain().focus().setHeading({ level }).run();
-      }
+      this.editor?.chain().focus().setHeading({ level }).run();
     },
     toggleBulletList() {
-      if (this.editor) {
-        this.editor.chain().focus().toggleBulletList().run();
-      }
+      this.editor?.chain().focus().toggleBulletList().run();
     },
     toggleOrderedList() {
-      if (this.editor) {
-        this.editor.chain().focus().toggleOrderedList().run();
-      }
+      this.editor?.chain().focus().toggleOrderedList().run();
     },
     addImage() {
-      const url = prompt("Enter image URL");
-      if (url && this.editor) {
-        this.editor.chain().focus().setImage({ src: url }).run();
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "image/*";
+
+      input.addEventListener("change", async () => {
+        const file = input.files[0];
+        if (file) {
+          await this.uploadImage(file);
+        }
+      });
+
+      input.click();
+    },
+    async uploadImage(file) {
+      const formData = new FormData();
+      formData.append("image", file);
+
+      try {
+        const response = await axios.post(
+          "http://localhost:8000/api/upload-image",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`, // Replace with your token logic
+            },
+            withCredentials: true,
+          }
+        );
+
+        const imageUrl = response.data.url;
+        console.log("Image uploaded successfully:", imageUrl);
+
+        if (this.editor) {
+          this.editor.commands.setImage({ src: imageUrl });
+        }
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          alert("You are not authorized to upload images. Please log in.");
+        } else {
+          console.error("Error uploading image:", error);
+          alert("Failed to upload image.");
+        }
+      }
+    },
+    handleDrop(event) {
+      event.preventDefault();
+      const file = event.dataTransfer.files[0];
+
+      if (file && file.type.startsWith("image/")) {
+        this.uploadImage(file);
       }
     },
     toggleHtmlView() {
