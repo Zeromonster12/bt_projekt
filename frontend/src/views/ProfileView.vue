@@ -101,8 +101,13 @@
           <button type="button" class="btn btn-light rounded-4 px-3" data-bs-dismiss="modal">
             Cancel
           </button>
-          <button type="button" class="btn btn-primary rounded-4 px-3" @click="saveProfile">
-            Save Changes
+          <button
+            type="button"
+            class="btn btn-primary rounded-4 px-3"
+            data-bs-dismiss="modal"
+            @click="saveProfile"
+          >         
+          Save Changes
           </button>
         </div>
       </div>
@@ -115,7 +120,6 @@
 import { useCounterStore } from "@/stores/counter";
 import NavBar from "@/components/NavBarComponent.vue";
 import api from "@/api"; 
-import * as bootstrap from 'bootstrap';
 
 export default {
   name: "ProfileView",
@@ -139,40 +143,24 @@ export default {
       this.passwordError = false; 
     },
     async saveProfile() {
-      if (this.selectedUser.password && this.selectedUser.password.length < 8) {
+       if (this.selectedUser.password && this.selectedUser.password.length < 8) {
         this.passwordError = true;
         return;
-      }
+  }
 
-      try {
-        const response = await api.put("/profile", {
-          name: this.selectedUser.name,
-          email: this.selectedUser.email,
-          password: this.selectedUser.password || undefined, 
-        });
+  try {
+    const response = await api.put("/profile", {
+      name: this.selectedUser.name,
+      email: this.selectedUser.email,
+      password: this.selectedUser.password || undefined,
+    });
 
-        this.counterStore.user.name = response.data.name;
-        this.counterStore.user.email = response.data.email;
+    this.counterStore.user.name = response.data.name;
+    this.counterStore.user.email = response.data.email;
 
-        const modal = document.getElementById('editProfileModal');
-        if (modal) {
-          const modalInstance = bootstrap.Modal.getInstance(modal);
-          modalInstance.hide();
-          
-          setTimeout(() => {
-            const backdrop = document.querySelector('.modal-backdrop');
-            if (backdrop) {
-              backdrop.remove();
-            }
-            document.body.classList.remove('modal-open');
-            document.body.style.removeProperty('padding-right');
-          }, 150);
-        }
-
-
-      } catch (error) {
-        console.error("Error updating profile:", error);
-        alert("Failed to update profile. Please try again.");
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    alert("Failed to update profile. Please try again.");
       }
     },
   },
