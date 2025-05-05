@@ -115,6 +115,7 @@
 import { useCounterStore } from "@/stores/counter";
 import NavBar from "@/components/NavBarComponent.vue";
 import api from "@/api"; 
+import * as bootstrap from 'bootstrap';
 
 export default {
   name: "ProfileView",
@@ -153,7 +154,20 @@ export default {
         this.counterStore.user.name = response.data.name;
         this.counterStore.user.email = response.data.email;
 
-        alert("Profile updated successfully!");
+        const modal = document.getElementById('editProfileModal');
+        if (modal) {
+          const modalInstance = bootstrap.Modal.getInstance(modal);
+          modalInstance.hide();
+          
+          setTimeout(() => {
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) {
+              backdrop.remove();
+            }
+            document.body.classList.remove('modal-open');
+            document.body.style.removeProperty('padding-right');
+          }, 150);
+        }
 
 
       } catch (error) {
