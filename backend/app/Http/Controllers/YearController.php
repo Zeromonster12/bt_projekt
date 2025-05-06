@@ -17,11 +17,10 @@ class YearController extends Controller
         try {
             $year = Year::create([
                 'year' => $request->input('year'),
-                'user_id' => $request->input('user_id'),
             ]);
             return response()->json(['message' => 'Ročník bol úspešne vytvorený.'], 200);
         } catch (QueryException $e) {
-            if ($e->getCode() === '23000') { // SQLSTATE[23000] is for integrity constraint violations
+            if ($e->getCode() === '23000') {
                 return response()->json(['message' => 'Rok už existuje.'], 400);
             }
             return response()->json(['message' => 'Nastala chyba pri vytváraní ročníka.'], 500);

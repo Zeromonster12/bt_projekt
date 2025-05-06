@@ -9,6 +9,9 @@
               <h3 class="text-center mb-0">Login</h3>
             </div>
             <div class="card-body p-5">
+              <div v-if="errorMessage" class="alert alert-danger">
+                {{ errorMessage }}
+              </div>
               <form @submit.prevent="login">
                 <div class="mb-3">
                   <label for="email" class="form-label">Email address</label>
@@ -23,7 +26,9 @@
                   <label class="form-check-label" for="remember">Remember me</label>
                 </div>
                 <div class="d-grid">
-                  <button type="submit" class="btn btn-primary rounded-4 px-3">Login</button>
+                  <button type="submit" class="btn btn-primary rounded-4 px-3" :disabled="loading">
+                    {{ loading ? 'Logging in...' : 'Login' }}
+                  </button>
                 </div>
               </form>
             </div>
@@ -42,8 +47,6 @@
 <script>
 import { useCounterStore } from '../stores/counter';
 import Navbar from '../components/NavBarComponent.vue';
-import api from '../api';
-import axios from 'axios';
 import csrf from '@/csrf';
 
 export default {
@@ -60,34 +63,34 @@ export default {
         remember: false,
       },
       loading: false,
+      errorMessage: '',
     }
   },
   methods: {
-    login() {
+    async login() {
       this.loading = true;
-
-      csrf.get('/sanctum/csrf-cookie')
-        .then(() => {
-          return this.counter.login(this.creds)
-        })
-        .then(() => {
-          if (this.counter.token) {
-            this.$router.push('/')
-          } else {
-            alert('Zlé prihlasovacie údaje')
-          }
-        })
-        .catch(() => {
-          alert('Chyba pri prihlasovaní')
-        })
-        .finally(() => {
-          this.loading = false;
-        })
+      this.errorMessage = '';
+      
+      try {
+        // First, get a CSRF cookie
+        await csrf.get('/sanctum/csrf-cookie');
+        
+        // Now try to login
+        const success = await this.counter.login(this.creds);
+        if (success) {
+          this.$router.push('/');
+        } else {
+          this.errorMessage = 'Zlé prihlasovacie údaje';
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        this.errorMessage = error.response?.data?.message || 'Chyba pri prihlasovaní';
+      } finally {
+        this.loading = false;
+      }
     }
   }
-
 }
-
 </script>
 
 <style>

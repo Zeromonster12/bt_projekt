@@ -243,6 +243,11 @@ export default {
     async addYear() {
       try {
         if (this.newYear) {
+          if (!this.counterStore.user || !this.counterStore.user.id) {
+            alert("Používateľ nie je prihlásený. Prihláste sa, prosím.");
+            return;
+          }
+          
           await api.post("/years", {
             year: this.newYear,
             user_id: this.counterStore.user.id,

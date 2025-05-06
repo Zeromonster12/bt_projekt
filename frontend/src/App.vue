@@ -1,33 +1,15 @@
 <script>
-import api from '@/api'
 import { useCounterStore } from './stores/counter'
 
 export default {
   data() {
     return {
-      userID: null,
-      user: null,
       counter: useCounterStore(),
       loading: false,
     }
   },
 
-  async created() {
-    const token = sessionStorage.getItem('token')
-    if (token) {
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`
-      this.loading = true
-      try {
-        const response = await api.get('/user')
-        this.user = response.data
-        this.counter.fetchUser()
-      } catch (error) {
-        sessionStorage.removeItem('token')
-      } finally {
-        this.loading = false
-      }
-    }
-  }
+  // Odstránil som created hook, keďže autentifikáciu teraz vykonávame v main.ts
 }
 </script>
 

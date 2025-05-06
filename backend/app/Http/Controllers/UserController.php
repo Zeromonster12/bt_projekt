@@ -3,10 +3,13 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Role;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Auth;
 use Str;
+use Illuminate\Support\Facades\Cookie;
+use Symfony\Component\HttpFoundation\Cookie as SymfonyCookie;
 
 class UserController extends Controller
 {
@@ -82,31 +85,65 @@ class UserController extends Controller
     {
         $request->validate([
             'email' => 'required|email',
-            'password' => 'required'
+            'password' => 'required',
+            'remember' => 'boolean'
         ]);
 
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json(['message' => 'Nesprávne prihlasovacie údaje.'], 401);
+        if (!Auth::attempt($request->only('email', 'password'), $request->remember)) {
+            return response()->json([
+                'message' => 'Nesprávne prihlasovacie údaje.'
+            ], 401);
         }
 
-        $user->tokens()->delete();
-
-        $token = $user->createToken('api-token')->plainTextToken;
-
-        return response()->json([
-            'token' => $token,
-            'token_type' => 'Bearer',
+        $user = Auth::user();
+        $token = $user->createToken('auth-token')->plainTextToken;
+        
+        // Vytvorenie response
+        $response = response()->json([
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role_id' => $user->role_id,
+            ],
+            'message' => 'Prihlásenie bolo úspešné.'
         ]);
-
+        
+        // Pridanie HTTP-only cookie s tokenom
+        $response->cookie(
+            'auth_token',
+            $token,
+            120, // 2 hodiny expirácia
+            '/',
+            null,
+            config('app.env') === 'production', // secure len v produkcii
+            true, // HTTP only
+            false, // same site
+            'lax' // same site policy
+        );
+        
+        return $response;
     }
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        // Zrušenie všetkých tokenov používateľa
+        if ($request->user()) {
+            $request->user()->tokens()->delete();
+        }
+        
+        // Odhlásenie z web guard
+        Auth::guard('web')->logout();
 
-        return response()->json(['message' => 'Úspešné odhlásenie']);
+        // Zneplatnenie session
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        // Vytvorenie response a zrušenie cookie
+        $response = response()->json(['message' => 'Odhlásenie prebehlo úspešne.']);
+        $response->cookie('auth_token', '', -1); // Zrušenie cookie
+        
+        return $response;
     }
 
     public function fetchUsers()
@@ -126,5 +163,19 @@ class UserController extends Controller
         return response()->json($users);
     }
 
-
+    public function getUser(Request $request)
+    {
+        $user = $request->user();
+        
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+        
+        return response()->json([
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'role_id' => $user->role_id,
+        ]);
+    }
 }
