@@ -23,9 +23,7 @@ app.component('font-awesome-icon', FontAwesomeIcon)
 app.use(pinia)
 app.use(router)
 
-// Inicializácia aplikácie - načíta stav autentifikácie z localStorage
 const counterStore = useCounterStore()
 counterStore.checkAuth()
 
-// Mountovanie aplikácie
 app.mount('#app')

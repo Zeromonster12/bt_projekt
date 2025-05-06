@@ -5,7 +5,7 @@ import api from '@/api';
 export const useCounterStore = defineStore('counter', {
   state: () => ({
     user: JSON.parse(localStorage.getItem('user')) || null,
-    isAuthenticated: false, // Zmenené: začíname s false, overíme pomocou API
+    isAuthenticated: false,
   }),
 
   actions: {
@@ -13,7 +13,6 @@ export const useCounterStore = defineStore('counter', {
       try {
         const response = await api.post('/login', creds);
         
-        // Uložíme len informácie o používateľovi do localStorage
         if (response.data && response.data.user) {
           localStorage.setItem('user', JSON.stringify(response.data.user));
           this.user = response.data.user;
@@ -33,7 +32,6 @@ export const useCounterStore = defineStore('counter', {
         this.user = response.data;
         this.isAuthenticated = true;
         
-        // Aktualizujeme localStorage
         localStorage.setItem('user', JSON.stringify(this.user));
         
         return this.user;
@@ -46,12 +44,10 @@ export const useCounterStore = defineStore('counter', {
     },
     
     async checkAuth() {
-      // Aktívne overíme autentifikáciu volaním API
       try {
         await this.fetchUser();
         return true;
       } catch (error) {
-        // Ak fetchUser zlyhá, nie sme autentifikovaní
         return false;
       }
     },
@@ -62,7 +58,6 @@ export const useCounterStore = defineStore('counter', {
       } catch (error) {
         console.error('Logout error:', error);
       } finally {
-        // Vždy vyčistíme localStorage a stav, aj keď server odpovie chybou
         localStorage.removeItem('user');
         this.user = null;
         this.isAuthenticated = false;
@@ -71,7 +66,6 @@ export const useCounterStore = defineStore('counter', {
   },
   
   getters: {
-    // Vráti rolu používateľa (môžete pridať podľa potreby)
     userRole: (state) => state.user ? state.user.role_id : null,
     userName: (state) => state.user ? state.user.name : null,
   }

@@ -72,10 +72,7 @@ export default {
       this.errorMessage = '';
       
       try {
-        // First, get a CSRF cookie
         await csrf.get('/sanctum/csrf-cookie');
-        
-        // Now try to login
         const success = await this.counter.login(this.creds);
         if (success) {
           this.$router.push('/');

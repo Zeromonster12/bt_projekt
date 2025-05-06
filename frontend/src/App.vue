@@ -8,8 +8,6 @@ export default {
       loading: false,
     }
   },
-
-  // Odstránil som created hook, keďže autentifikáciu teraz vykonávame v main.ts
 }
 </script>
 

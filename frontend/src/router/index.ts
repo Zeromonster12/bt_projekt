@@ -38,7 +38,7 @@ const router = createRouter({
       name: 'login',
       component: LoginView,
       meta: { 
-        requiresGuest: true // Túto stránku môžu vidieť iba neautentifikovaní používatelia
+        requiresGuest: true
       }
     },
     {
@@ -51,7 +51,7 @@ const router = createRouter({
       name: 'Profile',
       component: ProfileView,
       meta: { 
-        requiresAuth: true // Túto stránku môžu vidieť iba autentifikovaní používatelia
+        requiresAuth: true
       }
     },
     {
@@ -97,21 +97,17 @@ const router = createRouter({
   ],
 });
 
-// Stráženie chránených stránok
 router.beforeEach((to, from, next) => {
   const counterStore = useCounterStore();
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const requiresGuest = to.matched.some(record => record.meta.requiresGuest);
 
-  // Ak stránka vyžaduje prihlásenie a používateľ nie je prihlásený
   if (requiresAuth && !counterStore.isAuthenticated) {
     next('/login');
   }
-  // Ak stránka je určená pre neprihlásených a používateľ je prihlásený
   else if (requiresGuest && counterStore.isAuthenticated) {
     next('/');
   }
-  // V ostatných prípadoch pokračuj normálne
   else {
     next();
   }

@@ -27,7 +27,6 @@ Route::middleware(['web'])->group(function () {
         Route::delete('/deleteUser/{id}', [UserController::class, 'deleteUser']);
         Route::post('/logout', [UserController::class, 'logout']);
 
-        // Protecting /years endpoints
         Route::get('/years', [YearController::class, 'index']);
         Route::post('/years', [YearController::class, 'store']);
         Route::put('/years/{id}', [YearController::class, 'update']);
