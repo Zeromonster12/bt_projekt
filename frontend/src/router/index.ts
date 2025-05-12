@@ -93,23 +93,28 @@ const router = createRouter({
       meta: { 
         requiresAuth: true
       }
-    },
-  ],
+    },  ],
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const counterStore = useCounterStore();
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const requiresGuest = to.matched.some(record => record.meta.requiresGuest);
 
+  if (requiresAuth && !counterStore.isAuthenticated && localStorage.getItem('user')) {
+    try {
+      await counterStore.checkAuth();
+    } catch (error) {
+      return next('/login');
+    }
+  }
+
   if (requiresAuth && !counterStore.isAuthenticated) {
-    next('/login');
-  }
-  else if (requiresGuest && counterStore.isAuthenticated) {
-    next('/');
-  }
-  else {
-    next();
+    return next('/login');
+  } else if (requiresGuest && counterStore.isAuthenticated) {
+    return next('/');
+  } else {
+    return next();
   }
 });
 

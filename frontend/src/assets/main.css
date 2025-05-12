@@ -180,6 +180,54 @@ footer {
   transition: background-color 0.3s ease !important;
 }
 
+.selected-years {
+  background-color: #f8f9fa;
+}
+
+.available-years {
+  background-color: #f8f9fa;
+}
+
+.badge.bg-light:hover {
+  background-color: #e2e6ea !important;
+}
+
+.badge.bg-primary svg:hover {
+  color: #ffcccc;
+}
+
+.badge.bg-primary .remove-year-btn:hover svg {
+  color: #ffcccc;
+}
+
+.badge {
+  font-size: 0.85rem;
+  padding: 0.35em 0.65em;
+}
+
+.remove-year-btn {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.remove-year-btn:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.remove-year-btn i,
+.remove-year-btn svg {
+  font-size: 14px;
+  line-height: 1;
+  width: 14px;
+  height: 14px;
+}
+
 
 @media (max-width: 768px) {
   .content-wrapper {

@@ -8,6 +8,18 @@ export default {
       loading: false,
     }
   },
+  async created() {
+    if (localStorage.getItem('user') && !this.counter.isAuthenticated) {
+      this.loading = true;
+      try {
+        await this.counter.checkAuth();
+      } catch (error) {
+        console.error('Failed to restore authentication:', error);
+      } finally {
+        this.loading = false;
+      }
+    }
+  }
 }
 </script>
 

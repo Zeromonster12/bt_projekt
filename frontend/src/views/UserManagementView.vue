@@ -44,7 +44,7 @@
               </td>
               <td>
                 <span>
-                  <span v-for="year in user.years.slice(0, maxYearsToShow)" :key="year" class="badge bg-secondary me-1">
+                  <span v-for="year in user.years.slice(0, maxYearsToShow)" :key="year.id" class="badge bg-secondary me-1">
                     {{ year }}
                   </span>
                   <span v-if="user.years.length > maxYearsToShow" class="badge bg-secondary">...</span>
@@ -65,7 +65,8 @@
           </tbody>
         </table>
       </div>
-      <!-- Edit User Modal - presunuť do componentu -->
+
+      <!-- Edit User Modal -->
       <div class="modal fade" id="editUserModal" ref="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
@@ -82,9 +83,29 @@
               </select>
               <div class="mb-2">
                 <label class="form-label">Years</label>
-                <select multiple class="form-select" v-model="selectedUser.years" size="5">
-                  <option v-for="year in store.years" :key="year.id" :value="year.id">{{ year.year }}</option>
-                </select>
+                <div class="selected-years mb-2 p-2 border rounded" style="min-height: 40px;">
+                  <span v-if="selectedUser.years && selectedUser.years.length === 0" class="text-muted small">No years selected</span>
+                  <span v-for="yearId in selectedUser.years" :key="yearId" class="badge bg-primary me-1 mb-1 d-inline-flex align-items-center">
+                    <span>{{ getYearLabel(yearId) }}</span>
+                    <span class="remove-year-btn ms-1" @click="removeYear(yearId)" title="Remove year">
+                      <font-awesome-icon icon="times" />
+                    </span>
+                  </span>
+                </div>
+                <div class="available-years border rounded p-2" style="max-height: 150px; overflow-y: auto;">
+                  <div class="mb-1 small text-muted">Click to add:</div>
+                  <div class="d-flex flex-wrap gap-1">
+                    <span v-for="year in store.years" 
+                          :key="year.id" 
+                          class="badge me-1 mb-1" 
+                          :class="isYearSelected(year.id) ? 'bg-secondary' : 'bg-light text-dark'"
+                          style="cursor: pointer;"
+                          @click="toggleYear(year.id)">
+                      {{ year.year }}
+                    </span>
+                  </div>
+                  <div v-if="store.years.length === 0" class="text-muted small">No years available</div>
+                </div>
               </div>
             </div>
             <div class="modal-footer">
@@ -95,7 +116,8 @@
         </div>
       </div>
       <!-- End of Edit User Modal -->
-      <!-- User add modal -->
+
+      <!-- Add User Modal -->
       <div class="modal fade" id="addUserModal" ref="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
@@ -109,7 +131,7 @@
               <select class="form-select mb-2" v-model="newUser.role_id">
                 <option :value="1">Admin - 1</option>
                 <option :value="2">Editor - 2</option>
-              </select>
+              </select>   
             </div>
             <div class="modal-footer">
               <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -118,7 +140,7 @@
           </div>
         </div>
       </div>
-      <!-- End of User add modal -->
+      <!-- End of Add User Modal -->
     </div>
   </div>
 </template>
@@ -136,7 +158,7 @@ export default {
       store: useUserStore(),
       searchQuery: "",
       maxYearsToShow: 5,
-      selectedUser: { id: null, name: "", email: "", role_id: null, years: null },
+      selectedUser: { id: null, name: "", email: "", role_id: null, years: [] },
       newUser: { name: "", email: "", role_id: null, years: [] },
     };
   },
@@ -146,56 +168,97 @@ export default {
     },
   },
   methods: {
-    createNewUser() {
+    getYearLabel(yearId) {
+      const year = this.store.years.find(y => y.id === yearId);
+      return year ? year.year : yearId;
+    },
+    isYearSelected(yearId) {
+      return this.selectedUser.years.includes(yearId);
+    },
+    isNewYearSelected(yearId) {
+      return this.newUser.years.includes(yearId);
+    },
+    toggleYear(yearId) {
+      if (this.isYearSelected(yearId)) {
+        this.selectedUser.years = this.selectedUser.years.filter(id => id !== yearId);
+      } else {
+        this.selectedUser.years.push(yearId);
+      }
+    },
+    toggleNewYear(yearId) {
+      if (this.isNewYearSelected(yearId)) {
+        this.newUser.years = this.newUser.years.filter(id => id !== yearId);
+      } else {
+        this.newUser.years.push(yearId);
+      }
+    },
+    removeYear(yearId) {
+      this.selectedUser.years = this.selectedUser.years.filter(id => id !== yearId);
+    },
+    removeNewYear(yearId) {
+      this.newUser.years = this.newUser.years.filter(id => id !== yearId);
+    },
+    async createNewUser() {
       if (this.newUser.name && this.newUser.email && this.newUser.role_id) {
-        api.post('/createUser', this.newUser)
-        .then(response => {
-          this.store.users.push(response.data);
-          this.store.fetchUsers();
-        })
-        .catch(error => {
-          console.error("Error creating user:", error);
+        try {
+          await this.store.createUser(this.newUser);
+          this.newUser = { name: "", email: "", role_id: null, years: [] };
+          this.closeModal('addUserModal');
+        } catch (error) {
           alert("Failed to create user. Please try again.");
-        });
-        this.newUser = { name: "", email: "", role_id: null, years: [] };
+        }
       } else {
         alert("Please fill in all fields.");
       }
     },
+    closeModal(modalId) {
+      const closeBtn = document.querySelector(`#${modalId} .btn-close`);
+      if (closeBtn) {
+        closeBtn.click();
+      }
+    },
     editUser(user) {
+      const yearIds = user.years.map(year => {
+        if (typeof year === "object" && year !== null && "id" in year) {
+          return year.id;
+        } else {
+          const yearObj = this.store.years.find(y => y.year == year);
+          return yearObj ? yearObj.id : null;
+        }
+      }).filter(id => id !== null);
+
       this.selectedUser = {
         id: user.id,
         name: user.name,
         email: user.email,
         role_id: user.role_id,
-        years: [...user.years],
+        years: yearIds,
       };
     },
     saveUser() {
-      this.store.editedUsers = this.selectedUser;
-      this.store.updateUsers();
+      const cleanUser = {
+        ...this.selectedUser,
+        years: this.selectedUser.years,
+      };
+      this.store.editedUsers = cleanUser;
+      this.store.updateUsers()
+        .then(() => {
+          this.closeModal('editUserModal');
+        })
+        .catch(error => {
+          alert('Failed to update user: ' + (error.response?.data?.error || 'Unknown error'));
+        });
     },
     deleteUser(userId) {
       const confirmed = confirm(`Are you sure you want to delete user ID ${userId}?`);
       if (confirmed) {
-        this.store.users = this.store.users.filter((user) => user.id !== userId);
         this.store.deleteUser(userId);
       }
     },
-    updateMaxYearsToShow() {
-      const tableWidth = this.$refs.userTable.offsetWidth;
-      this.maxYearsToShow = Math.floor((tableWidth - 300) / 50);
-      if (this.maxYearsToShow < 1) this.maxYearsToShow = 1;
-    },
   },
   mounted() {
-    this.updateMaxYearsToShow();
-    window.addEventListener("resize", this.updateMaxYearsToShow);
     this.store.fetchYears();
     this.store.fetchUsers();
-  },
-  beforeUnmount() {
-    window.removeEventListener("resize", this.updateMaxYearsToShow);
   },
 };
 </script>

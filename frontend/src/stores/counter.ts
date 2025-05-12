@@ -5,7 +5,7 @@ import api from '@/api';
 export const useCounterStore = defineStore('counter', {
   state: () => ({
     user: JSON.parse(localStorage.getItem('user')) || null,
-    isAuthenticated: false,
+    isAuthenticated: !!localStorage.getItem('user'),
   }),
 
   actions: {

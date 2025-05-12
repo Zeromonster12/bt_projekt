@@ -8,8 +8,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\YearController;
 
 Route::middleware(['web'])->group(function () {
+    Route::get('/user', [UserController::class, 'getUser']);
+    Route::get('/years', [YearController::class, 'index']);
     Route::middleware(['auth:sanctum'])->group(function () {
-        Route::get('/user', [UserController::class, 'getUser']);
         Route::put('/profile', [UserController::class, 'updateProfile']);
         Route::get('/profile', function (Request $request) {
             return response()->json([
@@ -27,7 +28,7 @@ Route::middleware(['web'])->group(function () {
         Route::delete('/deleteUser/{id}', [UserController::class, 'deleteUser']);
         Route::post('/logout', [UserController::class, 'logout']);
 
-        Route::get('/years', [YearController::class, 'index']);
+       
         Route::post('/years', [YearController::class, 'store']);
         Route::put('/years/{id}', [YearController::class, 'update']);
         Route::delete('/years/{id}', [YearController::class, 'destroy']);
