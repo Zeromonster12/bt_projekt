@@ -78,18 +78,74 @@ export default {
 </script>
 
 <style scoped>
-.create-post {
-  max-width: 600px;
-  margin: 0 auto;
+/* Editor container */
+.editor-content {
+  min-height: 300px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  background-color: #ffffff;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow-y: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-form input,
-form button {
-  width: 100%;
+/* Toolbar buttons */
+.toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 15px;
 }
 
-form button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+.toolbar button {
+  font-size: 14px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f8f9fa;
+  color: #272727;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.toolbar button:hover {
+  background-color: #fe761b;
+  color: #ffffff;
+}
+
+.toolbar button:active {
+  background-color: #e65c00;
+  color: #ffffff;
+}
+
+/* HTML view */
+.html-view {
+  background-color: #f9f9f9;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  white-space: pre-wrap;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Placeholder text for the editor */
+.editor-content::before {
+  content: "Start typing here...";
+  color: #aaa;
+  font-style: italic;
+  display: block;
+  pointer-events: none;
+  position: absolute;
+  top: 15px;
+  left: 15px;
+}
+
+/* Remove placeholder when content is added */
+.editor-content:focus::before {
+  content: "";
 }
 </style>
