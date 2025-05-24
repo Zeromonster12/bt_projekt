@@ -10,15 +10,7 @@
         required
       />
 
-      <!-- WYSIWYG editor -->
       <WysiwygEditor v-model="content" />
-
-      <input
-        v-model="image"
-        type="text"
-        class="form-control mt-3"
-        placeholder="Image URL"
-      />
 
       <button class="btn btn-primary mt-3" :disabled="isSubmitting" @click="submitPost">
         <span v-if="isSubmitting">Creating...</span>
@@ -38,15 +30,13 @@ export default {
     return {
       title: "",
       content: "",
-      image: "",
-      isSubmitting: false, // Used to disable the button temporarily
+      isSubmitting: false,
     };
   },
   methods: {
     async submitPost() {
-      if (this.isSubmitting) return; // Prevent multiple clicks
+      if (this.isSubmitting) return;
 
-      // Validate title and content
       if (!this.title.trim()) {
         alert("Please fill in the title.");
         return;
@@ -56,21 +46,20 @@ export default {
         return;
       }
 
-      this.isSubmitting = true; // Disable the button
+      this.isSubmitting = true;
       try {
         const res = await api.post("/createPost", {
           title: this.title,
           body: this.content,
-          image: this.image,
         });
 
         alert(res.data.message);
-        this.$router.push("/"); // Redirect to homepage after successful post creation
+        this.$router.push("/");
       } catch (err) {
         console.error(err);
         alert("Failed to create post.");
       } finally {
-        this.isSubmitting = false; // Re-enable the button
+        this.isSubmitting = false;
       }
     },
   },
@@ -78,7 +67,6 @@ export default {
 </script>
 
 <style scoped>
-/* Editor container */
 .editor-content {
   min-height: 300px;
   font-family: 'Roboto', sans-serif;
@@ -92,7 +80,6 @@ export default {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Toolbar buttons */
 .toolbar {
   display: flex;
   gap: 8px;
@@ -120,7 +107,6 @@ export default {
   color: #ffffff;
 }
 
-/* HTML view */
 .html-view {
   background-color: #f9f9f9;
   padding: 15px;
@@ -132,7 +118,6 @@ export default {
   color: #333;
 }
 
-/* Placeholder text for the editor */
 .editor-content::before {
   content: "Start typing here...";
   color: #aaa;
@@ -144,7 +129,6 @@ export default {
   left: 15px;
 }
 
-/* Remove placeholder when content is added */
 .editor-content:focus::before {
   content: "";
 }

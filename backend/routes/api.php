@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -29,6 +30,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/years', [YearController::class, 'index']);
     Route::post('/years', [YearController::class, 'store']);
     Route::put('/years/{id}', [YearController::class, 'update']);
+    Route::post('/upload-image', [ImageUploadController::class, 'upload']);
     Route::delete('/years/{id}', [YearController::class, 'destroy']);
     Route::post('/createUser', [UserController::class, 'createUser']);
     Route::delete('/deleteUser/{id}', [UserController::class, 'deleteUser']);

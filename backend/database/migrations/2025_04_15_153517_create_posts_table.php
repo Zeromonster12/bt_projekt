@@ -1,4 +1,5 @@
 <?php
+<?php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -16,7 +17,7 @@ return new class extends Migration
             $table->foreignId('year_id')->constrained('years');
             $table->foreignId('user_id')->constrained('users');
             $table->string('title');
-            $table->text('body');
+            $table->longText('body');
             $table->text('image')->nullable();
             $table->timestamps();
         });
