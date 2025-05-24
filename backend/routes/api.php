@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -27,6 +28,7 @@ Route::middleware(['web'])->group(function () {
         Route::post('/createUser', [UserController::class, 'createUser']);
         Route::delete('/deleteUser/{id}', [UserController::class, 'deleteUser']);
         Route::post('/logout', [UserController::class, 'logout']);
+        Route::post('/upload-image', [ImageUploadController::class, 'upload']);
 
        
         Route::post('/years', [YearController::class, 'store']);

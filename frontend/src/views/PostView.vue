@@ -1,18 +1,19 @@
 <template>
-  <div>
-    <h1>Post Details</h1>
-    <div v-if="post" class="post-details">
-      <h2>{{ post.title }}</h2>
-      <p>{{ post.content }}</p>
-      <img v-if="post.image" :src="post.image" alt="Post Image" />
-      <p><strong>Created At:</strong> {{ post.created_at }}</p>
-      <p><strong>Updated At:</strong> {{ post.updated_at }}</p>
-      <p><strong>Year:</strong> {{ post.year }}</p>
-      <p><strong>User ID:</strong> {{ post.user_id }}</p>
-      <p><strong>Year ID:</strong> {{ post.year_id }}</p>
-      <p><strong>ID:</strong> {{ post.id }}</p>
+  <div class="post-page">
+    <div class="post-container" v-if="post">
+      <h1 class="post-title">{{ post.title }}</h1>
+      <div class="post-meta">
+        <span>Autor ID: {{ post.user_id }}</span>
+        <span>Rok: {{ post.year }}</span>
+        <span>Vytvorené: {{ post.created_at }}</span>
+        <span>Upravené: {{ post.updated_at }}</span>
+      </div>
+      <div class="post-body wysiwyg-content" v-html="post.body"></div>
+      <div v-if="post.image" class="post-image">
+        <img :src="post.image" alt="Obrázok príspevku" />
+      </div>
     </div>
-    <div v-else class="loading">Loading...</div>
+    <div v-else class="loading">Načítavam...</div>
   </div>
 </template>
 
@@ -41,3 +42,74 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.post-page {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0;
+  background: #f8f9fa;
+  min-height: 100vh;
+}
+
+.post-container {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+  padding: 2rem 2.5rem;
+  max-width: 800px;
+  width: 100%;
+}
+
+.post-title {
+  font-size: 2.2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+}
+
+.post-meta {
+  font-size: 0.95rem;
+  color: #888;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.post-body {
+  font-size: 1.1rem;
+  color: #222;
+  line-height: 1.7;
+  margin-bottom: 2rem;
+  /* Štýly pre obsah z WYSIWYG editora */
+}
+.wysiwyg-content img {
+  max-width: 100%;
+  border-radius: 8px;
+  margin: 1rem 0;
+  display: block;
+}
+.wysiwyg-content h1, .wysiwyg-content h2, .wysiwyg-content h3 {
+  color: #2c3e50;
+  margin-top: 1.5rem;
+}
+.wysiwyg-content ul, .wysiwyg-content ol {
+  margin-left: 2rem;
+}
+.post-image {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+.post-image img {
+  max-width: 100%;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+.loading {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #888;
+  margin-top: 3rem;
+}
+</style>

@@ -1,90 +1,135 @@
 <template>
-  <NavBar />
   <div class="create-post container mt-5">
-    <h1 class="mb-4">Create New Post ROLE: {{ user?.role_id }}</h1>
-    <form @submit.prevent="submitPost">
-      <div class="form-group mb-3">
-        <label for="title" class="form-label"></label>
-        <input
-          type="text"
-          id="title"
-          v-model="title"
-          class="form-control"
-          placeholder="Enter post title"
-          required
-        />
-      </div>
+    <h1 class="mb-4">Create New Post</h1>
+    <div>
+      <input
+        v-model="title"
+        type="text"
+        class="form-control mb-3"
+        placeholder="Title"
+        required
+      />
 
-      <div class="form-group mb-3">
-        <label for="content" class="form-label">Content</label>
-        <textarea
-          id="content"
-          v-model="content"
-          class="form-control"
-          rows="6"
-          placeholder="Enter post content"
-          required
-        ></textarea>
-      </div>
+      <WysiwygEditor v-model="content" />
 
-      <div class="form-group mb-3">
-        <label for="image" class="form-label">Image URL</label>
-        <input
-          type="text"
-          id="image"
-          v-model="image"
-          class="form-control"
-          placeholder="Enter image URL (optional)"
-        />
-      </div>
-
-      <button type="submit" class="btn btn-primary">Create Post</button>
-    </form>
+      <button class="btn btn-primary mt-3" :disabled="isSubmitting" @click="submitPost">
+        <span v-if="isSubmitting">Creating...</span>
+        <span v-else>Create Post</span>
+      </button>
+    </div>
   </div>
 </template>
 
 <script>
 import api from "@/api";
-import { useCounterStore } from "@/stores/counter";
-import NavBar from "@/components/NavBarComponent.vue";
+import WysiwygEditor from "@/components/WysiwygEditor.vue";
 
 export default {
-  name: "CreatePostView",
-  components: {
-    NavBar,
-  },
+  components: { WysiwygEditor },
   data() {
     return {
       title: "",
       content: "",
-      image: "",
-      store: useCounterStore(),
-      user: null,
+      isSubmitting: false,
     };
   },
   methods: {
     async submitPost() {
+      if (this.isSubmitting) return;
+
+      if (!this.title.trim()) {
+        alert("Please fill in the title.");
+        return;
+      }
+      if (!this.content.trim()) {
+        alert("Please fill in the content.");
+        return;
+      }
+
+      this.isSubmitting = true;
       try {
-        const response = await api.post("/createPost", {
+        const res = await api.post("/createPost", {
           title: this.title,
           body: this.content,
-          image: this.image,
-          user_id: this.user.id,
         });
-        alert(response.data.message);
+
+        alert(res.data.message);
         this.$router.push("/");
-      } catch (error) {
-        console.error("Error creating post:", error);
-        alert("Failed to create post. Please try again.");
+      } catch (err) {
+        console.error(err);
+        alert("Failed to create post.");
+      } finally {
+        this.isSubmitting = false;
       }
     },
-  },
-  mounted() {
-    this.user = this.store.user;
   },
 };
 </script>
 
 <style scoped>
+.editor-content {
+  min-height: 300px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  background-color: #ffffff;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow-y: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
 
+.toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.toolbar button {
+  font-size: 14px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f8f9fa;
+  color: #272727;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.toolbar button:hover {
+  background-color: #fe761b;
+  color: #ffffff;
+}
+
+.toolbar button:active {
+  background-color: #e65c00;
+  color: #ffffff;
+}
+
+.html-view {
+  background-color: #f9f9f9;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  white-space: pre-wrap;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 14px;
+  color: #333;
+}
+
+.editor-content::before {
+  content: "Start typing here...";
+  color: #aaa;
+  font-style: italic;
+  display: block;
+  pointer-events: none;
+  position: absolute;
+  top: 15px;
+  left: 15px;
+}
+
+.editor-content:focus::before {
+  content: "";
+}
 </style>

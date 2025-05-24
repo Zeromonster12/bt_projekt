@@ -4,17 +4,17 @@ namespace App\Http\Controllers;
 
 use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Post;
-
 
 class PostController extends Controller
 {
     public function index()
-        {
-            return Post::select('posts.id', 'posts.title', 'posts.body', 'years.year')
-                ->join('years', 'posts.year_id', '=', 'years.id')
-                ->get();
-        }
+    {
+        return Post::select('posts.id', 'posts.title', 'posts.body', 'years.year')
+            ->join('years', 'posts.year_id', '=', 'years.id')
+            ->get();
+    }
 
     public function show(Request $request)
     {
@@ -37,24 +37,19 @@ class PostController extends Controller
 
     public function create(Request $request)
     {
-
-
         $user = Auth::user();
 
-        if(!$user) {
-            return response()->json(['message' => 'Neprihlásený používatel - POSTCONTROLLER'], 401); 
+        if (!$user) {
+            return response()->json(['message' => 'Neprihlásený používateľ'], 401);
         }
-
-        $role = $user->role_name;
 
         $post = Post::create([
             'title' => $request->input('title'),
             'body' => $request->input('body'),
             'image' => $request->input('image'),
-            'user_id' => $request->input('user_id'),
-            'year_id' => 2,
+            'user_id' => $user->id,
+            'year_id' => 2, 
         ]);
-
 
         return response()->json(['message' => 'Post sa vytvoril'], 201);
     }
@@ -75,24 +70,25 @@ class PostController extends Controller
     }
 
     public function getPostById($id)
-        {
-            $post = Post::join('years', 'posts.year_id', '=', 'years.id')
-                ->where('posts.id', $id)
-                ->select('posts.*', 'years.year')
-                ->first();
-        
-            if (!$post) {
-                return response()->json(['message' => 'Post not found'], 404);
-            }
-        
-            return response()->json($post, 200);
+    {
+        $post = Post::join('years', 'posts.year_id', '=', 'years.id')
+            ->where('posts.id', $id)
+            ->select('posts.*', 'years.year')
+            ->first();
+    
+        if (!$post) {
+            return response()->json(['message' => 'Post not found'], 404);
         }
     
-        public function newestPost(){
-            $post = Post::join('years', 'posts.year_id', '=', 'years.id')
-                ->orderBy('posts.created_at', 'desc')
-                ->select('posts.*', 'years.year')
-                ->first();
-            return response()->json($post, 200);
-        }
+        return response()->json($post, 200);
+    }
+
+    public function newestPost()
+    {
+        $post = Post::join('years', 'posts.year_id', '=', 'years.id')
+            ->orderBy('posts.created_at', 'desc')
+            ->select('posts.*', 'years.year')
+            ->first();
+        return response()->json($post, 200);
+    }
 }
