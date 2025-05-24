@@ -1,4 +1,5 @@
 <template>
+  <Navbar />
   <div class="create-post container mt-5">
     <h1 class="mb-4">Create New Post</h1>
     <div>
@@ -22,10 +23,14 @@
 
 <script>
 import api from "@/api";
+import Navbar from "../components/NavBarComponent.vue";
 import WysiwygEditor from "@/components/WysiwygEditor.vue";
 
 export default {
-  components: { WysiwygEditor },
+  components: {
+    WysiwygEditor,
+    Navbar,
+     },
   data() {
     return {
       title: "",

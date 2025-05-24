@@ -1,8 +1,10 @@
 <template>
   <div>
-    <NavBar />
-    <div class="container mt-5">
-      <div class="mb-3 d-flex justify-content-between">
+    <NavBar />    <div class="container my-5">
+      <div class="d-flex justify-content-between mb-3">
+        <button class="btn btn-primary" @click="$router.push('/createPost')">
+          <i class="bi bi-plus-circle"></i> Create Post
+        </button>
         <div class="search-container" style="width: 300px;">
           <div class="input-group">
             <span class="input-group-text">
@@ -11,40 +13,36 @@
             <input type="text" class="form-control" placeholder="Search by title..." v-model="searchQuery">
           </div>
         </div>
-      </div>
-
-      <div class="table-responsive">
-        <table class="table table-striped table-bordered">
-          <thead class="table-dark">
-            <tr>
-              <th>Year</th>
-              <th>ID</th>
-              <th>Title</th>
-              <th>Content</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="post in filteredPosts" :key="post.id">
-              <td>{{ post.year }}</td>
-              <td>{{ post.id }}</td>
-              <td>{{ post.title }}</td>
-              <td>{{ post.body }}</td>
-              <td>
-                <button class="btn btn-sm btn-primary me-1" @click="editPost(post.id)">
-                  <i class="bi bi-pencil"></i> Edit
-                </button>
-                <button class="btn btn-sm btn-danger" @click="deletePost(post.id)">
-                  <i class="bi bi-trash"></i> Delete
-                </button>
-              </td>
-            </tr>
-            <tr v-if="filteredPosts.length === 0">
-              <td colspan="5" class="text-center">No posts found</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      </div>      <table class="table table-hover table-borderless align-middle text-center rounded-5">
+        <thead class="table-primary">
+          <tr class="text-center">
+            <th>Year</th>
+            <th>Title</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="post in filteredPosts" :key="post.id">
+            <td>{{ post.year }}</td>
+            <td>{{ post.title }}</td>
+            <td>
+              <button class="btn btn-sm btn-warning me-2 rounded-4 px-3" @click="editPost(post.id)">
+                <i class="bi bi-pencil"></i> Edit
+              </button>
+              <button class="btn btn-sm btn-danger rounded-4 px-3" @click="deletePost(post.id)">
+                <i class="bi bi-trash"></i> Delete
+              </button>
+            </td>
+          </tr>          <tr v-if="filteredPosts.length === 0">
+            <td colspan="3" class="text-center text-muted">No posts found</td>
+          </tr>
+        </tbody>        <tfoot>
+          <tr>
+            <td colspan="3" class="text-center rounded-bottom-5">    
+            </td>
+          </tr>
+        </tfoot>
+      </table>
     </div>
   </div>
 </template>
@@ -94,3 +92,10 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.table th,
+.table td {
+  vertical-align: middle;
+}
+</style>
