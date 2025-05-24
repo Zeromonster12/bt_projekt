@@ -1,8 +1,7 @@
 <template>
   <div>
-    <NavBar />
-    <div class="container mt-5">
-      <div class="mb-3 d-flex justify-content-between">
+    <NavBar />    <div class="container my-5">
+      <div class="d-flex justify-content-between mb-3">
         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
           <i class="bi bi-plus-circle"></i> Add New User
         </button>
@@ -16,18 +15,17 @@
         </div>
       </div>
 
-      <div class="table-responsive">
-        <table class="table table-striped table-bordered" ref="userTable">
-          <thead class="table-dark">
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Years</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
+      <table class="table table-hover table-borderless align-middle text-center rounded-5" ref="userTable">
+        <thead class="table-primary">
+          <tr class="text-center">
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Years</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
           <tbody>
             <tr v-for="user in filteredUsers" :key="user.id">
               <td>{{ user.id }}</td>
@@ -49,28 +47,29 @@
                   </span>
                   <span v-if="user.years.length > maxYearsToShow" class="badge bg-secondary">...</span>
                 </span>
-              </td>
-              <td>
-                <button class="btn btn-sm btn-primary me-1" data-bs-toggle="modal" data-bs-target="#editUserModal" @click="editUser(user)">
+              </td>              <td>                <button class="btn btn-sm btn-warning me-2 rounded-4 px-3" data-bs-toggle="modal" data-bs-target="#editUserModal" @click="editUser(user)">
                   <i class="bi bi-pencil"></i> Edit
                 </button>
-                <button class="btn btn-sm btn-danger" @click="deleteUser(user.id)">
+                <button class="btn btn-sm btn-danger rounded-4 px-3" @click="confirmDelete(user)">
                   <i class="bi bi-trash"></i> Delete
                 </button>
               </td>
             </tr>
             <tr v-if="filteredUsers.length === 0">
-              <td colspan="6" class="text-center">No users found</td>
+              <td colspan="6" class="text-center text-muted">No users found</td>
             </tr>
           </tbody>
-        </table>
-      </div>
-
-      <!-- Edit User Modal -->
+          <tfoot>
+            <tr>
+              <td colspan="6" class="text-center rounded-bottom-5">    
+              </td>
+            </tr>
+          </tfoot>
+        </table>      <!-- Edit User Modal -->
       <div class="modal fade" id="editUserModal" ref="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
         <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
+          <div class="modal-content border-0 shadow p-4 rounded-4">
+            <div class="modal-header border-0">
               <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -107,21 +106,18 @@
                   <div v-if="store.years.length === 0" class="text-muted small">No years available</div>
                 </div>
               </div>
-            </div>
-            <div class="modal-footer">
-              <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button class="btn btn-primary" @click="saveUser">Save</button>
+            </div>            <div class="modal-footer border-0">
+              <button class="btn btn-secondary rounded-4 px-3" data-bs-dismiss="modal">Close</button>
+              <button class="btn btn-primary rounded-4 px-3" @click="saveUser">Save</button>
             </div>
           </div>
         </div>
       </div>
-      <!-- End of Edit User Modal -->
-
-      <!-- Add User Modal -->
+      <!-- End of Edit User Modal -->      <!-- Add User Modal -->
       <div class="modal fade" id="addUserModal" ref="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
         <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
+          <div class="modal-content border-0 shadow p-4 rounded-4">
+            <div class="modal-header border-0">
               <h5 class="modal-title" id="addUserModalLabel">Add User</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -132,15 +128,34 @@
                 <option :value="1">Admin - 1</option>
                 <option :value="2">Editor - 2</option>
               </select>   
+            </div>            <div class="modal-footer border-0">
+              <button class="btn btn-secondary rounded-4 px-3" data-bs-dismiss="modal">Close</button>
+              <button class="btn btn-primary rounded-4 px-3" @click="createNewUser">Save</button>
             </div>
-            <div class="modal-footer">
-              <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button class="btn btn-primary" @click="createNewUser">Save</button>
+          </div>
+        </div>      </div>
+      <!-- End of Add User Modal -->
+      
+      <!-- Delete User Modal -->
+      <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content border-0 shadow p-4 rounded-4">
+            <div class="modal-header border-0">
+              <h5 class="modal-title" id="deleteUserModalLabel">Delete User</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              Are you sure you want to delete user <strong>{{ selectedUser.name }}</strong>?
+              <p class="text-danger mt-3 mb-0"><small>This action cannot be undone.</small></p>
+            </div>
+            <div class="modal-footer border-0">
+              <button class="btn btn-secondary rounded-4 px-3" data-bs-dismiss="modal">Cancel</button>
+              <button class="btn btn-danger rounded-4 px-3" @click="deleteUser">Delete</button>
             </div>
           </div>
         </div>
       </div>
-      <!-- End of Add User Modal -->
+      <!-- End of Delete User Modal -->
     </div>
   </div>
 </template>
@@ -149,6 +164,7 @@
 import api from "@/api";
 import NavBar from "@/components/NavBarComponent.vue";
 import { useUserStore } from "@/stores/userStore";
+import { Modal } from 'bootstrap';
 
 export default {
   name: "UserManagementView",
@@ -161,10 +177,11 @@ export default {
       selectedUser: { id: null, name: "", email: "", role_id: null, years: [] },
       newUser: { name: "", email: "", role_id: null, years: [] },
     };
-  },
-  computed: {
+  },  computed: {
     filteredUsers() {
-      return this.store.users.filter((user) => user.name.toLowerCase().includes(this.searchQuery.toLowerCase()));
+      return Array.isArray(this.store.users) 
+        ? this.store.users.filter((user) => user.name.toLowerCase().includes(this.searchQuery.toLowerCase()))
+        : [];
     },
   },
   methods: {
@@ -248,17 +265,33 @@ export default {
         .catch(error => {
           alert('Failed to update user: ' + (error.response?.data?.error || 'Unknown error'));
         });
-    },
-    deleteUser(userId) {
-      const confirmed = confirm(`Are you sure you want to delete user ID ${userId}?`);
-      if (confirmed) {
-        this.store.deleteUser(userId);
+    },    confirmDelete(user) {
+      this.selectedUser = { ...user };
+      const deleteModalEl = document.getElementById('deleteUserModal');
+      if (deleteModalEl) {
+        const deleteModal = new Modal(deleteModalEl);
+        deleteModal.show();
       }
     },
-  },
-  mounted() {
+      async deleteUser() {
+      try {
+        await this.store.deleteUser(this.selectedUser.id);
+        this.closeModal('deleteUserModal');
+      } catch (error) {
+        console.error("Error deleting user:", error);
+        alert("Failed to delete user. Please try again.");
+      }
+    },
+  },  mounted() {
     this.store.fetchYears();
     this.store.fetchUsers();
   },
 };
 </script>
+
+<style scoped>
+.table th,
+.table td {
+  vertical-align: middle;
+}
+</style>
