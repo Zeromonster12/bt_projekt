@@ -43,12 +43,19 @@ class PostController extends Controller
             return response()->json(['message' => 'Neprihlásený používateľ'], 401);
         }
 
+        // Validate required fields
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'body' => 'required|string',
+            'year_id' => 'required|exists:years,id',
+        ]);
+
         $post = Post::create([
             'title' => $request->input('title'),
             'body' => $request->input('body'),
             'image' => $request->input('image'),
             'user_id' => $user->id,
-            'year_id' => 2, 
+            'year_id' => $request->input('year_id'),
         ]);
 
         return response()->json(['message' => 'Post sa vytvoril'], 201);

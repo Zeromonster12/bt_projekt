@@ -3,15 +3,35 @@
   <div class="create-post container mt-5">
     <h1 class="mb-4">Create New Post</h1>
     <div>
+      <div class="mb-3">
+        <label for="yearSelect" class="form-label">Select Year</label>
+        <select id="yearSelect" v-model="selectedYear" class="form-select">
+          <option value="" disabled>Select a year</option>
+          <option v-for="year in postStore.yearsWithId" :key="year.id" :value="year.id">
+            {{ year.year }}
+          </option>
+        </select>
+        <div class="invalid-feedback" :class="{ 'd-block': !selectedYear && showValidation }">
+          Please select a year
+        </div>
+      </div>
+
       <input
         v-model="title"
         type="text"
         class="form-control mb-3"
         placeholder="Title"
         required
+        :class="{ 'is-invalid': !title.trim() && showValidation }"
       />
+      <div class="invalid-feedback" :class="{ 'd-block': !title.trim() && showValidation }">
+        Please enter a title
+      </div>
 
       <WysiwygEditor v-model="content" />
+      <div class="invalid-feedback" :class="{ 'd-block': !content.trim() && showValidation }">
+        Please enter content
+      </div>
 
       <button class="btn btn-primary mt-3" :disabled="isSubmitting" @click="submitPost">
         <span v-if="isSubmitting">Creating...</span>
@@ -25,6 +45,7 @@
 import api from "@/api";
 import Navbar from "../components/NavBarComponent.vue";
 import WysiwygEditor from "@/components/WysiwygEditor.vue";
+import { usePostStore } from "@/stores/postStore";
 
 export default {
   components: {
@@ -35,39 +56,54 @@ export default {
     return {
       title: "",
       content: "",
+      selectedYear: "",
       isSubmitting: false,
+      showValidation: false,
+      postStore: usePostStore(),
     };
-  },
-  methods: {
+  },  methods: {
     async submitPost() {
       if (this.isSubmitting) return;
 
-      if (!this.title.trim()) {
-        alert("Please fill in the title.");
-        return;
-      }
-      if (!this.content.trim()) {
-        alert("Please fill in the content.");
-        return;
-      }
+      // Show validation messages
+      this.showValidation = true;
 
-      this.isSubmitting = true;
+      if (!this.title.trim() || !this.content.trim() || !this.selectedYear) {
+        return;
+      }      this.isSubmitting = true;
       try {
         const res = await api.post("/createPost", {
           title: this.title,
           body: this.content,
+          year_id: this.selectedYear
         });
 
-        alert(res.data.message);
+        // Success notification
+        alert(res.data.message || 'Post created successfully');
+        
+        // Refresh posts in store and navigate back to posts list
+        this.postStore.fetchPosts();
         this.$router.push("/");
       } catch (err) {
         console.error(err);
-        alert("Failed to create post.");
+        
+        // Provide more specific error message if available from the API
+        if (err.response && err.response.data && err.response.data.message) {
+          alert(err.response.data.message);
+        } else if (err.response && err.response.data && err.response.data.errors) {
+          // Handle validation errors from Laravel
+          const errorMessages = Object.values(err.response.data.errors).flat();
+          alert(errorMessages.join('\n'));
+        } else {
+          alert("Failed to create post. Please try again.");
+        }
       } finally {
         this.isSubmitting = false;
-      }
-    },
+      }},
   },
+  mounted() {
+    this.postStore.fetchYearsWithId();
+  }
 };
 </script>
 
