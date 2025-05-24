@@ -164,6 +164,7 @@
 import api from "@/api";
 import NavBar from "@/components/NavBarComponent.vue";
 import { useUserStore } from "@/stores/userStore";
+import { Modal } from 'bootstrap';
 
 export default {
   name: "UserManagementView",
@@ -266,23 +267,26 @@ export default {
         });
     },    confirmDelete(user) {
       this.selectedUser = { ...user };
-      // Use data-bs attributes for showing modal instead
+<<<<<<< HEAD
       const deleteModalEl = document.getElementById('deleteUserModal');
       if (!deleteModalEl) return;
       
-      // Use the bootstrap attribute-based approach
       const deleteModal = document.querySelector('[data-bs-target="#deleteUserModal"]');
       if (deleteModal) {
-        deleteModal.click(); // Simulate click if button exists
+        deleteModal.click();
       } else {
-        // Fallback to using the data attribute directly
-        // This creates a temporary button, clicks it, and removes it
         const tempButton = document.createElement('button');
         tempButton.setAttribute('data-bs-toggle', 'modal');
         tempButton.setAttribute('data-bs-target', '#deleteUserModal');
         document.body.appendChild(tempButton);
         tempButton.click();
         document.body.removeChild(tempButton);
+=======
+      const deleteModalEl = document.getElementById('deleteUserModal');
+      if (deleteModalEl) {
+        const deleteModal = new Modal(deleteModalEl);
+        deleteModal.show();
+>>>>>>> 06b55bb9a7818af2cdba9427d837f0c76f129b1d
       }
     },
       async deleteUser() {
