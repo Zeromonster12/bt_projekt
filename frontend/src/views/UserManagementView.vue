@@ -164,7 +164,6 @@
 import api from "@/api";
 import NavBar from "@/components/NavBarComponent.vue";
 import { useUserStore } from "@/stores/userStore";
-import { Modal } from 'bootstrap';
 
 export default {
   name: "UserManagementView",
@@ -267,27 +266,13 @@ export default {
         });
     },    confirmDelete(user) {
       this.selectedUser = { ...user };
-<<<<<<< HEAD
-      const deleteModalEl = document.getElementById('deleteUserModal');
-      if (!deleteModalEl) return;
       
-      const deleteModal = document.querySelector('[data-bs-target="#deleteUserModal"]');
-      if (deleteModal) {
-        deleteModal.click();
-      } else {
-        const tempButton = document.createElement('button');
-        tempButton.setAttribute('data-bs-toggle', 'modal');
-        tempButton.setAttribute('data-bs-target', '#deleteUserModal');
-        document.body.appendChild(tempButton);
-        tempButton.click();
-        document.body.removeChild(tempButton);
-=======
-      const deleteModalEl = document.getElementById('deleteUserModal');
-      if (deleteModalEl) {
-        const deleteModal = new Modal(deleteModalEl);
-        deleteModal.show();
->>>>>>> 06b55bb9a7818af2cdba9427d837f0c76f129b1d
-      }
+      const tempButton = document.createElement('button');
+      tempButton.setAttribute('data-bs-toggle', 'modal');
+      tempButton.setAttribute('data-bs-target', '#deleteUserModal');
+      document.body.appendChild(tempButton);
+      tempButton.click();
+      document.body.removeChild(tempButton);
     },
       async deleteUser() {
       try {
