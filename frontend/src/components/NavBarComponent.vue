@@ -107,10 +107,10 @@ export default {
       }
       this.$router.push({ name: "Search", query: { phrase: this.searchPhrase } });
     },
-    logout() {
+    async logout() {
       try {
-        this.counter.logout();
-        this.$router.push('/login');
+        await this.counter.logout();
+        window.location.href = '/login';
       } catch (error) {
         alert('Logout error: ', error);
       }

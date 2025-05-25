@@ -46,6 +46,9 @@
     </div>
   </div>
 
+  <button @click="test()">Test API</button>
+  <button @click="test2()">Test API 2</button>
+
   <!-- Modal -->
   <div
     class="modal fade"
@@ -134,6 +137,26 @@ export default {
     };
   },
   methods: {
+    test() {
+      api.get("/admin-route")
+        .then((response) => {
+          console.log("Response from admin route:", response.data);
+        })
+        .catch((error) => {
+          console.error("Error accessing admin route:", error);
+          alert("Access denied or error occurred.");
+        });
+    },
+    test2() {
+      api.get("/editor-route")
+        .then((response) => {
+          console.log("Response from editor route:", response.data);
+        })
+        .catch((error) => {
+          console.error("Error accessing editor route:", error);
+          alert("Access denied or error occurred.");
+        });
+    },
     openEditProfileModal() {
       this.selectedUser = {
         name: this.counterStore.user?.name || "",

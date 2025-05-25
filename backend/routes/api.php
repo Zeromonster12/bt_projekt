@@ -8,7 +8,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\YearController;
 
+
+
 Route::middleware(['web'])->group(function () {
+    Route::middleware(['auth:sanctum', 'role:admin'])->get('/admin-route', function() {
+        return response()->json(['message' => 'Admin access granted']);
+    });
+    Route::middleware(['auth:sanctum', 'role:editor'])->get('/editor-route', function() {
+    return response()->json(['message' => 'Editor access granted']);
+});
     Route::get('/user', [UserController::class, 'getUser']);
     Route::get('/years', [YearController::class, 'index']);
     Route::middleware(['auth:sanctum'])->group(function () {
