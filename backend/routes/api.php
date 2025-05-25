@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
@@ -37,12 +38,15 @@ Route::middleware(['web'])->group(function () {
         Route::delete('/deleteUser/{id}', [UserController::class, 'deleteUser']);
         Route::post('/logout', [UserController::class, 'logout']);
         Route::post('/upload-image', [ImageUploadController::class, 'upload']);
-
+        Route::post('/upload-file', [FileUploadController::class, 'upload']);
+        
        
         Route::post('/years', [YearController::class, 'store']);
         Route::put('/years/{id}', [YearController::class, 'update']);
         Route::delete('/years/{id}', [YearController::class, 'destroy']);
     });
+
+    Route::get('/download-file/{filename}', [FileUploadController::class, 'download'])->name('file.download');
 
     Route::post('/login', [UserController::class, 'login']);
     Route::get('/posts', [PostController::class, 'index']);

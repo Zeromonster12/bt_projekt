@@ -98,7 +98,6 @@ class UserController extends Controller
         $user = Auth::user();
         $token = $user->createToken('auth-token')->plainTextToken;
         
-        // Vytvorenie response
         $response = response()->json([
             'user' => [
                 'id' => $user->id,
@@ -109,17 +108,16 @@ class UserController extends Controller
             'message' => 'Prihlásenie bolo úspešné.'
         ]);
         
-        // Pridanie HTTP-only cookie s tokenom
         $response->cookie(
             'auth_token',
             $token,
-            120, // 2 hodiny expirácia
+            120,
             '/',
             null,
-            config('app.env') === 'production', // secure len v produkcii
-            true, // HTTP only
-            false, // same site
-            'lax' // same site policy
+            config('app.env') === 'production',
+            true,
+            false,
+            'lax'
         );
         
         return $response;
@@ -127,21 +125,16 @@ class UserController extends Controller
 
     public function logout(Request $request)
     {
-        // Zrušenie všetkých tokenov používateľa
         if ($request->user()) {
             $request->user()->tokens()->delete();
         }
         
-        // Odhlásenie z web guard
         Auth::guard('web')->logout();
 
-        // Zneplatnenie session
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
-        // Vytvorenie response a zrušenie cookie
         $response = response()->json(['message' => 'Odhlásenie prebehlo úspešne.']);
-        $response->cookie('auth_token', '', -1); // Zrušenie cookie
+        $response->cookie('auth_token', '', -1);
         
         return $response;
     }
