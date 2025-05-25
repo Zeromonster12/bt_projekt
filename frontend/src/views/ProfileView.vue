@@ -1,11 +1,40 @@
 <template>
   <NavBar />
-    <div class="container my-5">
+  <div class="container my-5">
     <div class="row g-4 align-items-stretch">
       <!-- Left Profile Summary -->
       <div class="col-md-4">
         <div class="card shadow-sm border-0 text-center p-5 rounded-4 h-100">
-          <font-awesome-icon icon="user-circle" size="5x" class="mb-3 text-secondary" />
+          <!-- Profilová ikona s hover efektom -->
+          <label for="profilePictureUpload" class="profile-icon-label position-relative d-inline-block">
+            <template v-if="counterStore.user?.pfp">
+              <img
+                :src="counterStore.user.pfp"
+                alt="Profile Picture"
+                class="rounded-circle mb-3 profile-img"
+                style="width: 100px; height: 100px; object-fit: cover;"
+              />
+              <span class="edit-overlay d-flex justify-content-center align-items-center">
+                <font-awesome-icon icon="pencil" size="2x" />
+              </span>
+            </template>
+            <template v-else>
+              <font-awesome-icon
+                icon="user-circle"
+                size="5x"
+                class="mb-3 text-secondary profile-icon"
+              />
+              <span class="edit-overlay d-flex justify-content-center align-items-center">
+                <font-awesome-icon icon="arrow-left" size="2x" />
+              </span>
+            </template>
+          </label>
+          <input
+            type="file"
+            id="profilePictureUpload"
+            class="d-none"
+            @change="uploadProfilePicture"
+          />
           <h5 class="fw-semibold mb-1">{{ counterStore.user?.name || "Neprihlásený používateľ" }}</h5>
           <small class="text-muted mb-3 d-block">
             {{
@@ -137,6 +166,27 @@ export default {
     };
   },
   methods: {
+    async uploadProfilePicture(event) {
+  const file = event.target.files[0];
+  if (!file) {
+    alert("No file selected.");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    await api.post("/upload-pfp", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    await this.counterStore.fetchUser(); // toto načíta nové údaje vrátane pfp
+  } catch (error) {
+    console.error("Error uploading profile picture:", error);
+  }
+},
     test() {
       api.get("/admin-route")
         .then((response) => {
@@ -189,3 +239,31 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.profile-icon-label {
+  cursor: pointer;
+  position: relative;
+  display: inline-block;
+}
+.profile-img {
+  transition: filter 0.3s;
+}
+.profile-icon-label:hover .profile-img {
+  filter: brightness(0.5);
+}
+.edit-overlay {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 35%;
+  width: 100px;
+  height: 100px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  color: #fff;
+}
+.profile-icon-label:hover .edit-overlay {
+  opacity: 1;
+}
+</style>
