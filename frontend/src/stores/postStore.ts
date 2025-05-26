@@ -19,7 +19,8 @@ export const usePostStore = defineStore('post', {
       } catch (error) {
         console.error("Error deleting post:", error);
       }
-    },    async fetchPosts() {
+    },    
+    async fetchPosts() {
       try {
         const response = await api.get('/posts');
         this.posts = response.data;
@@ -82,6 +83,16 @@ export const usePostStore = defineStore('post', {
         }
       } catch (error) {
         console.error('Error fetching posts for the selected year:', error);
+      }
+    },
+
+    async newestPost() {
+      try {
+      const response = await api.get('/posts');
+      return response.data;
+      } catch (error) {
+      console.error('Error fetching newest post:', error);
+      return null;
       }
     },
 
