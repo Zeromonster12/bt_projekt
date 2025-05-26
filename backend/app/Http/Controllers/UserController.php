@@ -169,6 +169,8 @@ class UserController extends Controller
             'name' => $user->name,
             'email' => $user->email,
             'role_id' => $user->role_id,
+            'pfp' => $user->pfp,
+            'years' => $user->years->pluck('year')->toArray(),
         ]);
     }
 }

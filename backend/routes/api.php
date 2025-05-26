@@ -22,6 +22,7 @@ Route::middleware(['web'])->group(function () {
     Route::get('/years', [YearController::class, 'index']);
     Route::middleware(['auth:sanctum'])->group(function () {
         Route::put('/profile', [UserController::class, 'updateProfile']);
+        Route::post('/upload-pfp', [ImageUploadController::class, 'uploadpfp']);
         Route::get('/profile', function (Request $request) {
             return response()->json([
                 'name' => $request->user()->name,

@@ -29,6 +29,9 @@ export const useCounterStore = defineStore('counter', {
     async fetchUser() {
       try {
         const response = await api.get('/user');
+        if (response.data && response.data.pfp && !response.data.pfp.startsWith('http')) {
+          response.data.pfp = 'http://127.0.0.1:8000/' + response.data.pfp;
+        }
         this.user = response.data;
         this.isAuthenticated = true;
         
