@@ -59,7 +59,7 @@ const router = createRouter({
       name: 'UserManagement',
       component: UserManagementView,
       meta: { 
-        requiresAuth: true
+        requiresAdmin: true
       }
     },
     {
@@ -67,7 +67,7 @@ const router = createRouter({
       name: 'YearManagement',
       component: YearManagementView,
       meta: { 
-        requiresAuth: true
+        requiresAdmin: true
       }
     },
     {
@@ -100,6 +100,7 @@ router.beforeEach(async (to, from, next) => {
   const counterStore = useCounterStore();
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const requiresGuest = to.matched.some(record => record.meta.requiresGuest);
+  const requiresAdmin = to.matched.some(record => record.meta.requiresAdmin);
 
   if (requiresAuth && !counterStore.isAuthenticated && localStorage.getItem('user')) {
     try {
@@ -108,6 +109,9 @@ router.beforeEach(async (to, from, next) => {
       return next('/login');
     }
   }
+  if (requiresAdmin && counterStore.user?.role_id !== 1) {
+    return next('/');
+    }
 
   if (requiresAuth && !counterStore.isAuthenticated) {
     return next('/login');
@@ -116,6 +120,8 @@ router.beforeEach(async (to, from, next) => {
   } else {
     return next();
   }
+  
+  
 });
 
 export default router;

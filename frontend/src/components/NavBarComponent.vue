@@ -59,10 +59,10 @@
             <li>
               <router-link class="dropdown-item py-2" to="/profile">Profile Settings</router-link>
             </li>
-            <li>
+            <li v-if="user.role_id === 1">
               <router-link class="dropdown-item py-2" to="/user-management">User Management</router-link>
             </li>
-            <li>
+            <li v-if="user.role_id === 1">
               <router-link class="dropdown-item py-2" to="/year-management">Year Management</router-link>
             </li>
             <li>
