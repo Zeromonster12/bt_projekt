@@ -87,28 +87,22 @@ export default {
   },
   computed: {
     availableYears() {
-      // Get unique years from all posts
       const yearsSet = new Set(this.postStore.posts.map(post => post.year));
-      // Convert Set to Array and sort
       return Array.from(yearsSet).sort((a, b) => parseInt(b) - parseInt(a));
     },
     filteredPosts() {
-      // First apply text search filter
       let result = this.postStore.posts.filter((post) =>
         post.title.toLowerCase().includes(this.searchQuery.toLowerCase())
       );
       
-      // Then filter by year if a year is selected
       if (this.yearFilter) {
         result = result.filter(post => post.year === this.yearFilter);
       }
       
-      // Apply sorting
       return this.sortPosts(result);
     },
   },  methods: {
     createPost() {
-      // Pass the current year as a query parameter
       this.$router.push({
         path: "/createPost",
         query: { year: this.postStore.currentYear }
@@ -117,22 +111,16 @@ export default {
     editPost(postId) {
       this.$router.push(`/editPost/${postId}`);
     },    sortPosts(posts) {
-      // Create a new array to avoid mutating the original
       const sortedPosts = [...posts];
       
-      // Helper function to safely parse dates in various formats
       const parseDate = (dateStr) => {
         if (!dateStr) return null;
-        // Try standard Date parsing first
         let date = new Date(dateStr);
         if (!isNaN(date.getTime())) return date;
         
-        // If that fails, try to parse ISO or MySQL format manually
-        // Format: YYYY-MM-DD HH:MM:SS or YYYY-MM-DDTHH:MM:SS.sssZ
         const regex = /(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2}):(\d{2})/;
         const parts = regex.exec(dateStr);
         if (parts) {
-          // JavaScript months are 0-indexed
           return new Date(
             parseInt(parts[1]), 
             parseInt(parts[2]) - 1, 
@@ -145,17 +133,14 @@ export default {
         return null;
       };
       
-      // Helper function to safely compare dates
       const compareDates = (a, b, ascending = true) => {
         const dateA = parseDate(a.created_at);
         const dateB = parseDate(b.created_at);
         
-        // Handle null dates
         if (!dateA && !dateB) return 0;
         if (!dateA) return ascending ? 1 : -1;
         if (!dateB) return ascending ? -1 : 1;
         
-        // Compare the dates
         return ascending 
           ? dateA.getTime() - dateB.getTime() 
           : dateB.getTime() - dateA.getTime();
@@ -190,27 +175,13 @@ export default {
     },
   },  mounted() {
     this.postStore.fetchPosts().then(() => {
-      // Debug - check if posts have created_at timestamps
       if (this.postStore.posts.length > 0) {
         const sample = this.postStore.posts[0];
-        console.log('Sample post data structure:', sample);
-        console.log('Post has created_at:', !!sample.created_at);
         if (sample.created_at) {
-          console.log('Created at timestamp:', sample.created_at);
-          console.log('Is valid date:', !isNaN(new Date(sample.created_at).getTime()));
         }
       }
     });
   },
-  watch: {
-    // Refresh data when filters change
-    yearFilter() {
-      // You could add additional logic here if needed
-    },
-    sortBy() {
-      // You could add additional logic here if needed
-    }
-  }
 };
 </script>
 

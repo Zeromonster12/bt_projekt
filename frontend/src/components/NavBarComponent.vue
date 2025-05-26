@@ -48,7 +48,7 @@
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            <font-awesome-icon icon="user-circle" size="2x" />
+            <img :src="user.pfp" alt="Profilovka" class="profile-img" />
           </div>
           <ul class="dropdown-menu dropdown-menu-end p-4 border-1 rounded-4" aria-labelledby="profileDropdown">
             <li>
@@ -138,5 +138,12 @@ export default {
 
 .dropdown-menu {
   min-width: 200px;
+}
+
+.profile-img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 </style>
