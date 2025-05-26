@@ -39,12 +39,14 @@
             </div>
           </div>
         </div>
-      </div>      
+      </div>        
       <table class="table table-hover table-borderless align-middle text-center rounded-5">
         <thead class="table-primary">
           <tr class="text-center">
             <th>Year</th>
             <th>Title</th>
+            <th>Last Updated</th>
+            <th>Created By</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -52,6 +54,8 @@
           <tr v-for="post in filteredPosts" :key="post.id">
             <td>{{ post.year }}</td>
             <td>{{ post.title }}</td>
+            <td>{{ formatDateTime(post.updated_at) }}</td>
+            <td>{{ post.user_name || 'Unknown' }}</td>
             <td>
               <button class="btn btn-sm btn-warning me-2 rounded-4 px-3" @click="editPost(post.id)">
                 <i class="bi bi-pencil"></i> Edit
@@ -60,7 +64,8 @@
                 <i class="bi bi-trash"></i> Delete
               </button>
             </td>
-          </tr>          <tr v-if="filteredPosts.length === 0">
+          </tr>
+          <tr v-if="filteredPosts.length === 0">
             <td colspan="3" class="text-center text-muted">No posts found</td>
           </tr>
         </tbody>        <tfoot>
@@ -183,7 +188,28 @@ export default {
         default:
           return sortedPosts;
       }
+    },    
+    formatDateTime(dateTimeString) {
+      if (!dateTimeString) return 'N/A';
+      
+      try {
+        const date = new Date(dateTimeString);
+        
+        if (isNaN(date.getTime())) return 'Invalid date';
+        
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        
+        return `${day}.${month}.${year} ${hours}:${minutes}`;
+      } catch (error) {
+        console.error("Error formatting date:", error);
+        return 'Date error';
+      }
     },
+    
     async deletePost(postId) {
       try {
         const confirmed = confirm("Are you sure you want to delete this post?");

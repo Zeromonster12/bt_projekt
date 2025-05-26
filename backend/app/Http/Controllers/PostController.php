@@ -12,8 +12,17 @@ class PostController extends Controller
 {
     public function index()
     {
-        return Post::select('posts.id', 'posts.title', 'posts.body', 'posts.created_at', 'posts.updated_at', 'years.year')
+        return Post::select(
+                'posts.id', 
+                'posts.title', 
+                'posts.body', 
+                'posts.created_at', 
+                'posts.updated_at', 
+                'years.year',
+                'users.name as user_name'
+            )
             ->join('years', 'posts.year_id', '=', 'years.id')
+            ->join('users', 'posts.user_id', '=', 'users.id')
             ->get();
     }
 
@@ -22,11 +31,12 @@ class PostController extends Controller
         $q = $request->input('phrase');
         $posts = Post::query()
             ->join('years', 'posts.year_id', '=', 'years.id')
+            ->join('users', 'posts.user_id', '=', 'users.id')
             ->where(function ($query) use ($q) {
                 $query->where('posts.title', 'LIKE', "%{$q}%")
                       ->orWhere('posts.body', 'LIKE', "%{$q}%");
             })
-            ->select('posts.id', 'posts.image', 'posts.title', 'posts.body', 'years.year')
+            ->select('posts.id', 'posts.image', 'posts.title', 'posts.body', 'posts.created_at', 'posts.updated_at', 'years.year', 'users.name as user_name')
             ->get();
     
         if ($posts->isEmpty()) {
@@ -105,8 +115,9 @@ class PostController extends Controller
     {
         try {
             $post = Post::join('years', 'posts.year_id', '=', 'years.id')
+                ->join('users', 'posts.user_id', '=', 'users.id')
                 ->where('posts.id', $id)
-                ->select('posts.*', 'years.year')
+                ->select('posts.*', 'years.year', 'users.name as user_name')
                 ->first();
         
             if (!$post) {
@@ -127,8 +138,9 @@ class PostController extends Controller
     public function newestPost()
     {
         $post = Post::join('years', 'posts.year_id', '=', 'years.id')
+            ->join('users', 'posts.user_id', '=', 'users.id')
             ->orderBy('posts.created_at', 'desc')
-            ->select('posts.*', 'years.year')
+            ->select('posts.*', 'years.year', 'users.name as user_name')
             ->first();
         return response()->json($post, 200);
     }
