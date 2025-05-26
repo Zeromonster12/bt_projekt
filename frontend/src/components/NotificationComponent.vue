@@ -6,6 +6,9 @@
       :class="`notification-${notificationsStore.type}`"
     >
       {{ notificationsStore.message }}
+      <div class="progress-container">
+        <div class="progress-bar" :style="{ width: `${progress}%` }"></div>
+      </div>
     </div>
   </transition>
 </template>
@@ -17,8 +20,48 @@ export default {
   name: 'NotificationComponent',
   data() {
     return {
-      notificationsStore: useNotificationsStore()
+      notificationsStore: useNotificationsStore(),
+      progress: 100,
+      interval: null
     };
+  },
+  watch: {
+    'notificationsStore.visible': {
+      immediate: true,
+      handler(newVal) {
+        if (newVal) {
+          this.startProgressBar();
+        } else {
+          this.stopProgressBar();
+        }
+      }
+    }
+  },
+  methods: {
+    startProgressBar() {
+      this.stopProgressBar();
+      this.progress = 100;
+      
+      const duration = this.notificationsStore.duration || 3000;
+      const steps = 100;
+      const interval = duration / steps;
+      
+      this.interval = setInterval(() => {
+        this.progress -= 100 / steps;
+        if (this.progress <= 0) {
+          this.stopProgressBar();
+        }
+      }, interval);
+    },
+    stopProgressBar() {
+      if (this.interval) {
+        clearInterval(this.interval);
+        this.interval = null;
+      }
+    }
+  },
+  beforeUnmount() {
+    this.stopProgressBar();
   }
 };
 </script>
@@ -58,6 +101,26 @@ export default {
 .notification-info {
   background-color: #2196f3;
   color: #fff;
+}
+
+.progress-container {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  overflow: hidden;
+  width: 80%;
+  box-sizing: border-box;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.7);
+  transition: width 0.1s linear;
+  border-radius: 2px;
 }
 
 .fade-enter-active, .fade-leave-active {

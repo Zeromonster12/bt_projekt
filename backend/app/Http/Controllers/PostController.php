@@ -36,7 +36,7 @@ class PostController extends Controller
                 $query->where('posts.title', 'LIKE', "%{$q}%")
                       ->orWhere('posts.body', 'LIKE', "%{$q}%");
             })
-            ->select('posts.id', 'posts.image', 'posts.title', 'posts.body', 'posts.created_at', 'posts.updated_at', 'years.year', 'users.name as user_name')
+            ->select('posts.id', 'posts.title', 'posts.body', 'posts.created_at', 'posts.updated_at', 'years.year', 'users.name as user_name')
             ->get();
     
         if ($posts->isEmpty()) {
