@@ -15,8 +15,12 @@ class YearController extends Controller
 
     public function store(Request $request) {
         try {
+            $validated = $request->validate([
+                'year' => 'required|integer|min:1900|max:2100|unique:years,year',
+            ]);
+            
             $year = Year::create([
-                'year' => $request->input('year'),
+                'year' => $validated['year'],
             ]);
             return response()->json(['message' => 'Ročník bol úspešne vytvorený.'], 200);
         } catch (QueryException $e) {
@@ -35,8 +39,15 @@ class YearController extends Controller
     public function update(Request $request, $id)
     {
         try {
+            $validated = $request->validate([
+                'year' => 'required|integer|min:1900|max:2100|unique:years,year,'.$id.',id',
+            ]);
+            
             $year = Year::findOrFail($id);
-            $year->update($request->all());
+            $year->update([
+                'year' => $validated['year']
+            ]);
+            
             return response()->json(['message' => 'Ročník bol úspešne aktualizovaný.', 'year' => $year], 200);
         } catch (QueryException $e) {
             if ($e->getCode() === '23000') { // SQLSTATE[23000] je pre porušenie jedinečnosti
