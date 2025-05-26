@@ -3,18 +3,18 @@
   <div class="create-post container mt-5">
     <h1 class="mb-4">Create New Post</h1>
     <div>
-      <div class="mb-3">
-        <label for="yearSelect" class="form-label">Select Year</label>
-        <select id="yearSelect" v-model="selectedYear" class="form-select">
-          <option value="" disabled>Select a year</option>
-          <option v-for="year in postStore.yearsWithId" :key="year.id" :value="year.id">
-            {{ year.year }}
-          </option>
-        </select>
-        <div class="invalid-feedback" :class="{ 'd-block': !selectedYear && showValidation }">
-          Please select a year
-        </div>
+    <div class="mb-3">
+      <label for="yearSelect" class="form-label">Select Year</label>
+      <select id="yearSelect" v-model="selectedYear" class="form-select">
+        <option value="" disabled>Select a year</option>
+        <option v-for="year in availableYears" :key="year.id" :value="year.id">
+          {{ year.year }}
+        </option>
+      </select>
+      <div class="invalid-feedback" :class="{ 'd-block': !selectedYear && showValidation }">
+        Please select a year
       </div>
+    </div>
 
       <input
         v-model="title"
@@ -46,12 +46,13 @@ import api from "@/api";
 import Navbar from "../components/NavBarComponent.vue";
 import WysiwygEditor from "@/components/WysiwygEditor.vue";
 import { usePostStore } from "@/stores/postStore";
+import { useCounterStore } from "@/stores/counter";
 
 export default {
   components: {
     WysiwygEditor,
     Navbar,
-     },
+  },
   data() {
     return {
       title: "",
@@ -60,12 +61,31 @@ export default {
       isSubmitting: false,
       showValidation: false,
       postStore: usePostStore(),
+      counterStore: useCounterStore(), 
     };
-  },  methods: {
+  },
+  computed: {
+    availableYears() {
+      if (!this.postStore.yearsWithId) return [];
+      
+      if (this.counterStore.user?.role_id === 1) {
+        return this.postStore.yearsWithId;
+      }
+      
+      if (this.counterStore.user?.role_id === 2) {
+        const userYears = this.counterStore.user.years || [];
+        return this.postStore.yearsWithId.filter(yearObj => {
+          return userYears.includes(yearObj.year.toString());
+        });
+      }
+      
+      return [];
+    }
+  },
+  methods: {
     async submitPost() {
       if (this.isSubmitting) return;
 
-      // Show validation messages
       this.showValidation = true;
 
       if (!this.title.trim() || !this.content.trim() || !this.selectedYear) {
@@ -78,20 +98,16 @@ export default {
           year_id: this.selectedYear
         });
 
-        // Success notification
         alert(res.data.message || 'Post created successfully');
         
-        // Refresh posts in store and navigate back to posts list
         this.postStore.fetchPosts();
         this.$router.push("/");
       } catch (err) {
         console.error(err);
         
-        // Provide more specific error message if available from the API
         if (err.response && err.response.data && err.response.data.message) {
           alert(err.response.data.message);
         } else if (err.response && err.response.data && err.response.data.errors) {
-          // Handle validation errors from Laravel
           const errorMessages = Object.values(err.response.data.errors).flat();
           alert(errorMessages.join('\n'));
         } else {
@@ -100,27 +116,26 @@ export default {
       } finally {
         this.isSubmitting = false;
       }},
-  },  async mounted() {
+  },  
+  async mounted() {
     await this.postStore.fetchYearsWithId();
     
-    // First try to get the year from query parameter
     const queryYear = parseInt(this.$route.query.year);
     
-    if (queryYear && this.postStore.yearsWithId.length > 0) {
-      // Find the year ID that matches the query year
-      const yearObject = this.postStore.yearsWithId.find(y => parseInt(y.year) === queryYear);
+    if (queryYear && this.availableYears.length > 0) {
+      const yearObject = this.availableYears.find(y => parseInt(y.year) === queryYear);
       if (yearObject) {
         this.selectedYear = yearObject.id;
         return;
       }
     }
     
-    // Fall back to current year from store
-    if (this.postStore.currentYear && this.postStore.yearsWithId.length > 0) {
-      // Find the year ID that matches the store's current year
-      const yearObject = this.postStore.yearsWithId.find(y => parseInt(y.year) === this.postStore.currentYear);
+    if (this.postStore.currentYear && this.availableYears.length > 0) {
+      const yearObject = this.availableYears.find(y => parseInt(y.year) === this.postStore.currentYear);
       if (yearObject) {
         this.selectedYear = yearObject.id;
+      } else if (this.availableYears.length > 0) {
+        this.selectedYear = this.availableYears[0].id;
       }
     }
   }
