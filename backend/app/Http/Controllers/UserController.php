@@ -173,4 +173,13 @@ class UserController extends Controller
             'years' => $user->years->pluck('year')->toArray(),
         ]);
     }
+
+    public function getProfile(Request $request)
+    {
+        return response()->json([
+            'name' => $request->user()->name,
+            'email' => $request->user()->email,
+            'role_id' => $request->user()->role_id,
+        ]);
+    }
 }
