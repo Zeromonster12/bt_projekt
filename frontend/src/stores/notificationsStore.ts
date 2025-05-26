@@ -53,6 +53,10 @@ export const useNotificationsStore = defineStore('notifications', {
 
     info(message, duration = 2000) {
       this.show(message, 'info', duration);
+    },
+
+    pass(message, duration = 10000) {
+      this.show(message, 'info', duration);
     }
   }
 });

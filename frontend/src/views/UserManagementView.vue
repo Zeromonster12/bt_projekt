@@ -224,7 +224,7 @@ export default {
           this.newUser = { name: "", email: "", role_id: null, years: [] };
           this.closeModal('addUserModal');
           if (responseData && responseData.message) {
-            this.notificationsStore.success(responseData.message);
+            this.notificationsStore.pass(responseData.message);
           } else {
             this.notificationsStore.success("User created successfully!");
           }
@@ -246,7 +246,8 @@ export default {
       const yearIds = user.years.map(year => {
         if (typeof year === "object" && year !== null && "id" in year) {
           return year.id;
-        } else {
+        } 
+        else {
           const yearObj = this.store.years.find(y => y.year == year);
           return yearObj ? yearObj.id : null;
         }
