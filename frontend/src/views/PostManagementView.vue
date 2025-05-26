@@ -20,7 +20,7 @@
               <span class="input-group-text">Filter by Year</span>
               <select class="form-select" v-model="yearFilter">
                 <option value="">All Years</option>
-                <option v-for="year in availableYears" :key="year" :value="year">{{ year }}</option>
+                <option v-for="year in visibleYears" :key="year" :value="year">{{ year }}</option>
               </select>
             </div>
           </div>
@@ -73,13 +73,16 @@
 <script>
 import NavBar from "@/components/NavBarComponent.vue";
 import { usePostStore } from "@/stores/postStore";
+import { useCounterStore } from "@/stores/counter";
 import api from "@/api"; 
 
 export default {
   name: "PostManagementView",
-  components: { NavBar },  data() {
+  components: { NavBar },
+  data() {
     return {
       postStore: usePostStore(),
+      userStore: useCounterStore(),
       searchQuery: "",
       yearFilter: "",
       sortBy: "created_desc",
@@ -90,6 +93,20 @@ export default {
       const yearsSet = new Set(this.postStore.posts.map(post => post.year));
       return Array.from(yearsSet).sort((a, b) => parseInt(b) - parseInt(a));
     },
+    
+    visibleYears() {
+      if (this.userStore.userRole === 1) {
+        return this.availableYears;
+      }
+      
+      if (this.userStore.userRole === 2) {
+        const userYears = this.userStore.user.years || [];
+        return this.availableYears.filter(year => userYears.includes(year));
+      }
+      
+      return [];
+    },
+    
     filteredPosts() {
       let result = this.postStore.posts.filter((post) =>
         post.title.toLowerCase().includes(this.searchQuery.toLowerCase())
@@ -97,11 +114,15 @@ export default {
       
       if (this.yearFilter) {
         result = result.filter(post => post.year === this.yearFilter);
+      } else if (this.userStore.userRole === 2) {
+        const userYears = this.userStore.user.years || [];
+        result = result.filter(post => userYears.includes(post.year));
       }
       
       return this.sortPosts(result);
     },
-  },  methods: {
+  },
+   methods: {
     createPost() {
       this.$router.push({
         path: "/createPost",
