@@ -39,6 +39,7 @@ Route::middleware(['web'])->group(function () {
         Route::post('/logout', [UserController::class, 'logout']);
         Route::post('/upload-image', [ImageUploadController::class, 'upload']);
         Route::post('/upload-file', [FileUploadController::class, 'upload']);
+        Route::put('/posts/{id}', [PostController::class, 'update']);
         
        
         Route::post('/years', [YearController::class, 'store']);

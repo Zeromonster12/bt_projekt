@@ -82,9 +82,12 @@ export default {
     goToPost(postId) {
       const year = this.currentYear || new Date().getFullYear();
       this.$router.push(`/${year}/post/${postId}`);
-    },
-    createPost() {
-      this.$router.push("/createPost");
+    },    createPost() {
+      // Pass the current year as a query parameter to the create post page
+      this.$router.push({
+        path: "/createPost",
+        query: { year: this.currentYear }
+      });
     },
 
     async fetchYears() {

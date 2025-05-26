@@ -1,12 +1,8 @@
 <template>
   <div class="post-page">
     <div class="post-container" v-if="post">
-      <h1 class="post-title">{{ post.title }}</h1>
-      <div class="post-meta">
-        <span>Autor ID: {{ post.user_id }}</span>
-        <span>Rok: {{ post.year }}</span>
-        <span>Vytvorené: {{ post.created_at }}</span>
-        <span>Upravené: {{ post.updated_at }}</span>
+      <h1 class="post-title">{{ post.title }}</h1>      <div class="post-meta">
+        <span>Naposledy upravené: {{ formatDateTime(post.updated_at) }}</span>
       </div>
       <div class="post-body wysiwyg-content" v-html="post.body"></div>
       <div v-if="post.image" class="post-image">
@@ -26,11 +22,27 @@ export default {
     post() {
       return this.postStore.selectedPost;
     },
-  },
-  data() {
+  },  data() {
     return {
       postStore: usePostStore(),
     };
+  },
+  methods: {
+    formatDateTime(dateTimeString) {
+      if (!dateTimeString) return '';
+      
+      
+      const date = new Date(dateTimeString);
+      
+      
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const year = date.getFullYear();
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      
+      return `${day}.${month}.${year} ${hours}:${minutes}`;
+    }
   },
   watch: {
     "$route.params.postId": {
@@ -81,7 +93,6 @@ export default {
   color: #222;
   line-height: 1.7;
   margin-bottom: 2rem;
-  /* Štýly pre obsah z WYSIWYG editora */
 }
 .wysiwyg-content img {
   max-width: 100%;

@@ -11,7 +11,7 @@ class PostController extends Controller
 {
     public function index()
     {
-        return Post::select('posts.id', 'posts.title', 'posts.body', 'years.year')
+        return Post::select('posts.id', 'posts.title', 'posts.body', 'posts.created_at', 'posts.updated_at', 'years.year')
             ->join('years', 'posts.year_id', '=', 'years.id')
             ->get();
     }
@@ -97,5 +97,33 @@ class PostController extends Controller
             ->select('posts.*', 'years.year')
             ->first();
         return response()->json($post, 200);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Neprihlásený používateľ'], 401);
+        }
+
+        $post = Post::find($id);
+
+        if (!$post) {
+            return response()->json(['message' => 'Post not found'], 404);
+        }
+
+        // Validate required fields
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'body' => 'required|string',
+        ]);
+
+        $post->title = $request->input('title');
+        $post->body = $request->input('body');
+        
+        $post->save();
+
+        return response()->json(['message' => 'Post bol úspešne aktualizovaný'], 200);
     }
 }

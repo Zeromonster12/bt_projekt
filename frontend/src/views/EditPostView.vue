@@ -19,16 +19,6 @@
         <WysiwygEditor v-model="content" />
       </div>
 
-      <div class="form-group mb-3">
-        <label for="image">Image URL</label>
-        <input
-          type="text"
-          id="image"
-          v-model="image"
-          class="form-control"
-        />
-      </div>
-
       <button type="submit" class="btn btn-success">Save Changes</button>
     </form>
   </div>
@@ -40,29 +30,33 @@ import WysiwygEditor from "@/components/WysiwygEditor.vue";
 
 export default {
   name: "EditPostView",
+  components: {
+    WysiwygEditor
+  },
   data() {
     return {
       title: "",
       content: "",
+      image: "",
     };
-  },
-  async created() {
-    const postId = this.$route.params.postId;
+  },  async created() {
+    const postId = this.$route.params.id;
     try {
-      const response = await api.get(`/posts/${postId}`);
+      const response = await api.get(`/post/${postId}`);
       this.title = response.data.title;
       this.content = response.data.body;
+      this.image = response.data.image || "";
     } catch (error) {
       console.error("Error fetching post:", error);
     }
-  },
-  methods: {
-    async updatePost() {
-      const postId = this.$route.params.postId;
+  },  methods: {
+    async submitEdit() {
+      const postId = this.$route.params.id;
       try {
         await api.put(`/posts/${postId}`, {
           title: this.title,
           body: this.content,
+          image: this.image
         });
         alert("Post updated successfully!");
         this.$router.push("/postManagement");

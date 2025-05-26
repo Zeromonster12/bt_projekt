@@ -1,8 +1,6 @@
 <template>
   <div>
-    <NavBar />    <div class="container my-5">
-      <div class="d-flex justify-content-between mb-3">
-        <button class="btn btn-primary" @click="$router.push('/createPost')">
+    <NavBar />    <div class="container my-5">      <div class="d-flex justify-content-between mb-3">        <button class="btn btn-primary" @click="createPost">
           <i class="bi bi-plus-circle"></i> Create Post
         </button>
         <div class="search-container" style="width: 300px;">
@@ -11,6 +9,31 @@
               <i class="bi bi-search"></i>
             </span>
             <input type="text" class="form-control" placeholder="Search by title..." v-model="searchQuery">
+          </div>
+        </div>
+      </div>
+      
+      <div class="filtering-options mb-3">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="input-group">
+              <span class="input-group-text">Filter by Year</span>
+              <select class="form-select" v-model="yearFilter">
+                <option value="">All Years</option>
+                <option v-for="year in availableYears" :key="year" :value="year">{{ year }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="input-group">
+              <span class="input-group-text">Sort By</span>
+              <select class="form-select" v-model="sortBy">
+                <option value="created_desc">Newest First</option>
+                <option value="created_asc">Oldest First</option>
+                <option value="title_asc">Title (A-Z)</option>
+                <option value="title_desc">Title (Z-A)</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>      <table class="table table-hover table-borderless align-middle text-center rounded-5">
@@ -54,23 +77,102 @@ import api from "@/api";
 
 export default {
   name: "PostManagementView",
-  components: { NavBar },
-  data() {
+  components: { NavBar },  data() {
     return {
       postStore: usePostStore(),
       searchQuery: "",
+      yearFilter: "",
+      sortBy: "created_desc",
     };
   },
   computed: {
+    availableYears() {
+      // Get unique years from all posts
+      const yearsSet = new Set(this.postStore.posts.map(post => post.year));
+      // Convert Set to Array and sort
+      return Array.from(yearsSet).sort((a, b) => parseInt(b) - parseInt(a));
+    },
     filteredPosts() {
-      return this.postStore.posts.filter((post) =>
+      // First apply text search filter
+      let result = this.postStore.posts.filter((post) =>
         post.title.toLowerCase().includes(this.searchQuery.toLowerCase())
       );
+      
+      // Then filter by year if a year is selected
+      if (this.yearFilter) {
+        result = result.filter(post => post.year === this.yearFilter);
+      }
+      
+      // Apply sorting
+      return this.sortPosts(result);
     },
-  },
-  methods: {
+  },  methods: {
+    createPost() {
+      // Pass the current year as a query parameter
+      this.$router.push({
+        path: "/createPost",
+        query: { year: this.postStore.currentYear }
+      });
+    },
     editPost(postId) {
       this.$router.push(`/editPost/${postId}`);
+    },    sortPosts(posts) {
+      // Create a new array to avoid mutating the original
+      const sortedPosts = [...posts];
+      
+      // Helper function to safely parse dates in various formats
+      const parseDate = (dateStr) => {
+        if (!dateStr) return null;
+        // Try standard Date parsing first
+        let date = new Date(dateStr);
+        if (!isNaN(date.getTime())) return date;
+        
+        // If that fails, try to parse ISO or MySQL format manually
+        // Format: YYYY-MM-DD HH:MM:SS or YYYY-MM-DDTHH:MM:SS.sssZ
+        const regex = /(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2}):(\d{2})/;
+        const parts = regex.exec(dateStr);
+        if (parts) {
+          // JavaScript months are 0-indexed
+          return new Date(
+            parseInt(parts[1]), 
+            parseInt(parts[2]) - 1, 
+            parseInt(parts[3]), 
+            parseInt(parts[4]), 
+            parseInt(parts[5]), 
+            parseInt(parts[6])
+          );
+        }
+        return null;
+      };
+      
+      // Helper function to safely compare dates
+      const compareDates = (a, b, ascending = true) => {
+        const dateA = parseDate(a.created_at);
+        const dateB = parseDate(b.created_at);
+        
+        // Handle null dates
+        if (!dateA && !dateB) return 0;
+        if (!dateA) return ascending ? 1 : -1;
+        if (!dateB) return ascending ? -1 : 1;
+        
+        // Compare the dates
+        return ascending 
+          ? dateA.getTime() - dateB.getTime() 
+          : dateB.getTime() - dateA.getTime();
+      };
+      
+      switch (this.sortBy) {
+        case 'created_desc':
+          return sortedPosts.sort((a, b) => compareDates(a, b, false));
+        case 'created_asc':
+          return sortedPosts.sort((a, b) => compareDates(a, b, true));
+        case 'title_asc':
+          return sortedPosts.sort((a, b) => a.title.localeCompare(b.title));
+        case 'title_desc':
+          return sortedPosts.sort((a, b) => b.title.localeCompare(a.title));
+        default:
+          return sortedPosts;
+      }
     },
     async deletePost(postId) {
       try {
@@ -86,10 +188,29 @@ export default {
         alert("Failed to delete post. Please try again.");
       }
     },
+  },  mounted() {
+    this.postStore.fetchPosts().then(() => {
+      // Debug - check if posts have created_at timestamps
+      if (this.postStore.posts.length > 0) {
+        const sample = this.postStore.posts[0];
+        console.log('Sample post data structure:', sample);
+        console.log('Post has created_at:', !!sample.created_at);
+        if (sample.created_at) {
+          console.log('Created at timestamp:', sample.created_at);
+          console.log('Is valid date:', !isNaN(new Date(sample.created_at).getTime()));
+        }
+      }
+    });
   },
-  mounted() {
-    this.postStore.fetchPosts();
-  },
+  watch: {
+    // Refresh data when filters change
+    yearFilter() {
+      // You could add additional logic here if needed
+    },
+    sortBy() {
+      // You could add additional logic here if needed
+    }
+  }
 };
 </script>
 
@@ -97,5 +218,16 @@ export default {
 .table th,
 .table td {
   vertical-align: middle;
+}
+
+.filtering-options {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.filtering-options .input-group {
+  margin-bottom: 0;
 }
 </style>

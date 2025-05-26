@@ -20,8 +20,7 @@ export default {
       type: String,
       default: ''
     }
-  },
-  data() {
+  },  data() {
     return {
       innerContent: this.modelValue,
       editorInstance: null,
@@ -62,8 +61,17 @@ export default {
               editor.execCommand('mceMedia');
             }
           });
-        }.bind(this)
+        }.bind(this)      }
+    }
+  },
+  watch: {
+    modelValue(newValue) {
+      if (newValue !== this.innerContent) {
+        this.innerContent = newValue;
       }
+    },
+    innerContent(newValue) {
+      this.$emit('update:modelValue', newValue);
     }
   },
   methods: {

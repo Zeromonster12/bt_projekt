@@ -100,9 +100,29 @@ export default {
       } finally {
         this.isSubmitting = false;
       }},
-  },
-  mounted() {
-    this.postStore.fetchYearsWithId();
+  },  async mounted() {
+    await this.postStore.fetchYearsWithId();
+    
+    // First try to get the year from query parameter
+    const queryYear = parseInt(this.$route.query.year);
+    
+    if (queryYear && this.postStore.yearsWithId.length > 0) {
+      // Find the year ID that matches the query year
+      const yearObject = this.postStore.yearsWithId.find(y => parseInt(y.year) === queryYear);
+      if (yearObject) {
+        this.selectedYear = yearObject.id;
+        return;
+      }
+    }
+    
+    // Fall back to current year from store
+    if (this.postStore.currentYear && this.postStore.yearsWithId.length > 0) {
+      // Find the year ID that matches the store's current year
+      const yearObject = this.postStore.yearsWithId.find(y => parseInt(y.year) === this.postStore.currentYear);
+      if (yearObject) {
+        this.selectedYear = yearObject.id;
+      }
+    }
   }
 };
 </script>

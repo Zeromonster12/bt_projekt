@@ -19,15 +19,15 @@ export const usePostStore = defineStore('post', {
       } catch (error) {
         console.error("Error deleting post:", error);
       }
-    },
-
-    async fetchPosts() {
+    },    async fetchPosts() {
       try {
         const response = await api.get('/posts');
         this.posts = response.data;
         this.filterPostsByYear(this.currentYear);
+        return this.posts; // Return the posts for promise chaining
       } catch (error) {
         console.error('Error fetching posts:', error);
+        return []; // Return empty array in case of error
       }
     },
 
