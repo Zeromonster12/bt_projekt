@@ -14,18 +14,18 @@
     </div>
 
     <div v-else class="list-group list-group-flush">
-    <div
-      class="list-group-item list-group-item-action list-group-item-light p-3"
-      @click="$router.push('/')"
-    >
-      <font-awesome-icon icon="arrow-left" /> Back
-    </div>
-      <div v-if="isEditor" class="p-3">
+      <div
+        class="list-group-item list-group-item-action list-group-item-light p-3"
+        @click="$router.push('/')"
+      >
+        <font-awesome-icon icon="arrow-left" /> Back
+      </div>
+      <div v-if="canCreatePost" class="p-3">
         <button class="btn btn-success w-100" @click="createPost">
           <font-awesome-icon icon="plus" /> Create Post
         </button>
       </div>
-            <div
+      <div
         class="list-group-item list-group-item-action list-group-item-light p-3"
         v-for="post in postStore.filteredPosts"
         :key="post.id"
@@ -33,8 +33,6 @@
         @click="goToPost(post.id)"
       >
         <span style="cursor: pointer;">{{ post.title }}</span>
-      
-
       </div>
     </div>
   </div>
@@ -55,6 +53,18 @@ export default {
   computed: {
     isEditor() {
       return this.counterStore.user && [2, 1].includes(this.counterStore.user.role_id);
+    },
+    canCreatePost() {
+      if (!this.counterStore.user) return false;
+      
+      if (this.counterStore.user.role_id === 1) return true;
+      
+      if (this.counterStore.user.role_id === 2 && this.currentYear) {
+        const userYears = this.counterStore.user.years || [];
+        return userYears.includes(this.currentYear.toString());
+      }
+      
+      return false;
     },
     activePostId() {
       return parseInt(this.$route.params.postId);
@@ -83,7 +93,6 @@ export default {
       const year = this.currentYear || new Date().getFullYear();
       this.$router.push(`/${year}/post/${postId}`);
     },    createPost() {
-      // Pass the current year as a query parameter to the create post page
       this.$router.push({
         path: "/createPost",
         query: { year: this.currentYear }
