@@ -48,7 +48,6 @@ footer {
 
 .main-content {
   flex-grow: 1;
-  padding: 5rem;
   background-color: #f5f5f5;
 }
 
@@ -65,8 +64,11 @@ footer {
 }
 
 .list-group-item.active {
-  background-color: #fe761b !important;
-  border-color: #fe761b !important;
+  background-color: #f0f0f0 !important;
+  border-color: #bdbdbd !important;
+  color: #272727 !important;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(189, 189, 189, 0.08);
 }
 
 .post-list {
@@ -226,6 +228,32 @@ footer {
   line-height: 1;
   width: 14px;
   height: 14px;
+}
+
+.profile-icon-label {
+  cursor: pointer;
+  position: relative;
+  display: inline-block;
+}
+.profile-img {
+  transition: filter 0.3s;
+}
+.profile-icon-label:hover .profile-img {
+  filter: brightness(0.5);
+}
+.edit-overlay {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 35%;
+  width: 100px;
+  height: 100px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  color: #fff;
+}
+.profile-icon-label:hover .edit-overlay {
+  opacity: 1;
 }
 
 

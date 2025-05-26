@@ -2,10 +2,8 @@
   <NavBar />
   <div class="container my-5">
     <div class="row g-4 align-items-stretch">
-      <!-- Left Profile Summary -->
       <div class="col-md-4">
         <div class="card shadow-sm border-0 text-center p-5 rounded-4 h-100">
-          <!-- Profilová ikona s hover efektom -->
           <label for="profilePictureUpload" class="profile-icon-label position-relative d-inline-block">
             <template v-if="counterStore.user?.pfp">
               <img
@@ -58,7 +56,6 @@
         </div>
       </div>
   
-      <!-- Right Profile Info -->
       <div class="col-md-8">
         <div class="card shadow-sm border-0 p-5 rounded-4 h-100">
           <h5 class="fw-semibold mb-4 mt-2">Profile Information</h5>
@@ -74,10 +71,6 @@
       </div>
     </div>
   </div>
-
-  <button @click="test()">Test API</button>
-  <button @click="test2()">Test API 2</button>
-  <button @click="test3()">Test API 3</button>
 
   <!-- Modal -->
   <div
@@ -168,55 +161,25 @@ export default {
   },
   methods: {
     async uploadProfilePicture(event) {
-  const file = event.target.files[0];
-  if (!file) {
-    alert("No file selected.");
-    return;
-  }
+      const file = event.target.files[0];
+      if (!file) {
+        alert("No file selected.");
+        return;
+      }
 
-  const formData = new FormData();
-  formData.append("file", file);
+      const formData = new FormData();
+      formData.append("file", file);
 
-  try {
-    await api.post("/upload-pfp", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-    await this.counterStore.fetchUser(); // toto načíta nové údaje vrátane pfp
-  } catch (error) {
-    console.error("Error uploading profile picture:", error);
-  }
-},
-    test() {
-      api.get("/admin-route")
-        .then((response) => {
-          console.log("Response from admin route:", response.data);
-        })
-        .catch((error) => {
-          console.error("Error accessing admin route:", error);
-          alert("Access denied or error occurred.");
+      try {
+        await api.post("/upload-pfp", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         });
-    },
-    test2() {
-      api.get("/editor-route")
-        .then((response) => {
-          console.log("Response from editor route:", response.data);
-        })
-        .catch((error) => {
-          console.error("Error accessing editor route:", error);
-          alert("Access denied or error occurred.");
-        });
-    },
-    test3() {
-      api.get("/shared-route")
-        .then((response) => {
-          console.log("Response from user route:", response.data);
-        })
-        .catch((error) => {
-          console.error("Error accessing user route:", error);
-          alert("Access denied or error occurred.");
-        });
+        await this.counterStore.fetchUser();
+      } catch (error) {
+        console.error("Error uploading profile picture:", error);
+      }
     },
     openEditProfileModal() {
       this.selectedUser = {
@@ -230,51 +193,22 @@ export default {
        if (this.selectedUser.password && this.selectedUser.password.length < 8) {
         this.passwordError = true;
         return;
-  }
-
-  try {
-    const response = await api.put("/profile", {
-      name: this.selectedUser.name,
-      email: this.selectedUser.email,
-      password: this.selectedUser.password || undefined,
-    });
-
-    this.counterStore.user.name = response.data.name;
-    this.counterStore.user.email = response.data.email;
-
-  } catch (error) {
-    console.error("Error updating profile:", error);
-    alert("Failed to update profile. Please try again.");
       }
-    },
-  },
-};
-</script>
+      try {
+        const response = await api.put("/profile", {
+          name: this.selectedUser.name,
+          email: this.selectedUser.email,
+          password: this.selectedUser.password || undefined,
+        });
 
-<style scoped>
-.profile-icon-label {
-  cursor: pointer;
-  position: relative;
-  display: inline-block;
-}
-.profile-img {
-  transition: filter 0.3s;
-}
-.profile-icon-label:hover .profile-img {
-  filter: brightness(0.5);
-}
-.edit-overlay {
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  left: 35%;
-  width: 100px;
-  height: 100px;
-  opacity: 0;
-  transition: opacity 0.3s;
-  color: #fff;
-}
-.profile-icon-label:hover .edit-overlay {
-  opacity: 1;
-}
-</style>
+        this.counterStore.user.name = response.data.name;
+        this.counterStore.user.email = response.data.email;
+
+      } catch (error) {
+        console.error("Error updating profile:", error);
+        alert("Failed to update profile. Please try again.");
+          }
+        },
+      },
+    };
+</script>

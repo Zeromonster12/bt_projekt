@@ -64,7 +64,7 @@ export default {
 }
 
 .post-container {
-  background: #fff;
+  background: #f1f1f1;
   border-radius: 12px;
   padding: 2rem 2.5rem;
   width: 100%;
