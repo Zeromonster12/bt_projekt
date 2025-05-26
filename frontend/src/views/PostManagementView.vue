@@ -1,8 +1,11 @@
 <template>
   <div>
-    <NavBar />    <div class="container my-5">      <div class="d-flex justify-content-between mb-3">        <button class="btn btn-primary" @click="createPost">
-          <i class="bi bi-plus-circle"></i> Create Post
-        </button>
+    <NavBar />
+        <div class="container my-5">
+         <div class="d-flex justify-content-between mb-3">
+          <button class="btn btn-primary" @click="createPost">
+            <i class="bi bi-plus-circle"></i> Create Post
+          </button>
         <div class="search-container" style="width: 300px;">
           <div class="input-group">
             <span class="input-group-text">
@@ -36,7 +39,8 @@
             </div>
           </div>
         </div>
-      </div>      <table class="table table-hover table-borderless align-middle text-center rounded-5">
+      </div>      
+      <table class="table table-hover table-borderless align-middle text-center rounded-5">
         <thead class="table-primary">
           <tr class="text-center">
             <th>Year</th>
