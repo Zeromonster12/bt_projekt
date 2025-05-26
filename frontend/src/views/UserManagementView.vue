@@ -220,10 +220,14 @@ export default {
     async createNewUser() {
       if (this.newUser.name && this.newUser.email && this.newUser.role_id) {
         try {
-          await this.store.createUser(this.newUser);
+          const responseData = await this.store.createUser(this.newUser);
           this.newUser = { name: "", email: "", role_id: null, years: [] };
           this.closeModal('addUserModal');
-          this.notificationsStore.success("User created successfully!");
+          if (responseData && responseData.message) {
+            this.notificationsStore.success(responseData.message);
+          } else {
+            this.notificationsStore.success("User created successfully!");
+          }
         } catch (error) {
           console.error("Error creating user:", error);
           this.notificationsStore.error("Failed to create user. Please try again.");

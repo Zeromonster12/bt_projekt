@@ -1,4 +1,5 @@
 <template>
+  <NavBar />
   <div class="edit-post container mt-5">
     <h1 class="mb-4">Edit Post</h1>
 
@@ -40,6 +41,7 @@
 
 <script>
 import api from "@/api";
+import NavBar from "@/components/NavBarComponent.vue";
 import WysiwygEditor from "@/components/WysiwygEditor.vue";
 import { useCounterStore } from "@/stores/counter"; 
 import { useNotificationsStore } from "@/stores/notificationsStore";
@@ -47,6 +49,7 @@ import { useNotificationsStore } from "@/stores/notificationsStore";
 export default {
   name: "EditPostView",
   components: {
+    NavBar,
     WysiwygEditor
   },
   data() {
