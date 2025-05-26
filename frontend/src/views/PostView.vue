@@ -59,7 +59,6 @@ export default {
 .post-page {
   display: flex;
   justify-content: center;
-  padding: 2rem 0;
   background: #f8f9fa;
   min-height: 100vh;
 }
@@ -67,7 +66,6 @@ export default {
 .post-container {
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.07);
   padding: 2rem 2.5rem;
   width: 100%;
 }

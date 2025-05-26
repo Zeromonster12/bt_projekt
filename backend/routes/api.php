@@ -12,6 +12,11 @@ use App\Http\Controllers\YearController;
 
 
 Route::middleware(['web'])->group(function () {
+    Route::middleware(['auth:sanctum', 'role:admin,editor'])->group(function () {
+        Route::get('/shared-route', function() {
+            return response()->json(['message' => 'Both roles can access this']);
+        });
+    });
     Route::middleware(['auth:sanctum', 'role:admin'])->get('/admin-route', function() {
         return response()->json(['message' => 'Admin access granted']);
     });
@@ -23,13 +28,7 @@ Route::middleware(['web'])->group(function () {
     Route::middleware(['auth:sanctum'])->group(function () {
         Route::put('/profile', [UserController::class, 'updateProfile']);
         Route::post('/upload-pfp', [ImageUploadController::class, 'uploadpfp']);
-        Route::get('/profile', function (Request $request) {
-            return response()->json([
-                'name' => $request->user()->name,
-                'email' => $request->user()->email,
-                'role_id' => $request->user()->role_id,
-            ]);
-        });
+        Route::get('/profile', [UserController::class, 'getProfile']);
         Route::post('/createPost', [PostController::class, 'create']);
         Route::get('/deletePost/{id}', [PostController::class, 'destroy']);
         Route::get('/newestPost', [PostController::class, 'newestPost']);

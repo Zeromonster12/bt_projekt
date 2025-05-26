@@ -104,6 +104,7 @@ class UserController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
                 'role_id' => $user->role_id,
+                'pfp' => $user->pfp,
             ],
             'message' => 'Prihlásenie bolo úspešné.'
         ]);

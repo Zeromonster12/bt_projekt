@@ -77,6 +77,7 @@
 
   <button @click="test()">Test API</button>
   <button @click="test2()">Test API 2</button>
+  <button @click="test3()">Test API 3</button>
 
   <!-- Modal -->
   <div
@@ -204,6 +205,16 @@ export default {
         })
         .catch((error) => {
           console.error("Error accessing editor route:", error);
+          alert("Access denied or error occurred.");
+        });
+    },
+    test3() {
+      api.get("/shared-route")
+        .then((response) => {
+          console.log("Response from user route:", response.data);
+        })
+        .catch((error) => {
+          console.error("Error accessing user route:", error);
           alert("Access denied or error occurred.");
         });
     },

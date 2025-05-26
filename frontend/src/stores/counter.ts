@@ -14,6 +14,9 @@ export const useCounterStore = defineStore('counter', {
         const response = await api.post('/login', creds);
         
         if (response.data && response.data.user) {
+          if (response.data.user.pfp && !response.data.user.pfp.startsWith('http')) {
+            response.data.user.pfp = 'http://127.0.0.1:8000/' + response.data.user.pfp;
+          }
           localStorage.setItem('user', JSON.stringify(response.data.user));
           this.user = response.data.user;
           this.isAuthenticated = true;

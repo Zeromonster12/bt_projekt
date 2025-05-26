@@ -75,6 +75,11 @@ export default {
         await csrf.get('/sanctum/csrf-cookie');
         const success = await this.counter.login(this.creds);
         if (success) {
+          try {
+            await this.counter.fetchUser();
+          } catch (error) {
+            console.warn('Could not fetch additional user data:', error);
+          }
           this.$router.push('/');
         } else {
           this.errorMessage = 'Zlé prihlasovacie údaje';
