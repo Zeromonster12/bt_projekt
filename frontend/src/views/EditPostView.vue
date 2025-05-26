@@ -4,6 +4,20 @@
 
     <form @submit.prevent="submitEdit">
       <div class="form-group mb-3">
+        <label for="year">Year</label>
+        <select
+          id="year"
+          v-model="selectedYear"
+          class="form-control"
+          required
+        >
+          <option v-for="year in years" :key="year.id" :value="year.id">
+            {{ year.year }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group mb-3">
         <label for="title">Title</label>
         <input
           type="text"
@@ -38,30 +52,42 @@ export default {
       title: "",
       content: "",
       image: "",
+      years: [],
+      selectedYear: null,
     };
-  },  async created() {
+  },  
+  async created() {
     const postId = this.$route.params.id;
     try {
+      const yearsResponse = await api.get("/years");
+      this.years = yearsResponse.data;
+
       const response = await api.get(`/post/${postId}`);
       this.title = response.data.title;
       this.content = response.data.body;
       this.image = response.data.image || "";
+      this.selectedYear = response.data.year_id;
     } catch (error) {
-      console.error("Error fetching post:", error);
+      console.error("Error fetching post or years:", error);
     }
-  },  methods: {
+  },
+  methods: {
     async submitEdit() {
       const postId = this.$route.params.id;
-      try {
-        await api.put(`/posts/${postId}`, {
+      try {       
+        const response = await api.put(`/posts/${postId}`, {
           title: this.title,
           body: this.content,
-          image: this.image
+          image: this.image,
+          year_id: this.selectedYear, 
         });
         alert("Post updated successfully!");
         this.$router.push("/postManagement");
       } catch (error) {
         console.error("Error updating post:", error);
+        if (error.response) {
+          console.error("Error details:", error.response.data);
+        }
         alert("Failed to update post. Please try again.");
       }
     },

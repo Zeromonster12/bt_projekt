@@ -78,16 +78,25 @@ class PostController extends Controller
 
     public function getPostById($id)
     {
-        $post = Post::join('years', 'posts.year_id', '=', 'years.id')
-            ->where('posts.id', $id)
-            ->select('posts.*', 'years.year')
-            ->first();
-    
-        if (!$post) {
-            return response()->json(['message' => 'Post not found'], 404);
+        try {
+            $post = Post::join('years', 'posts.year_id', '=', 'years.id')
+                ->where('posts.id', $id)
+                ->select('posts.*', 'years.year')
+                ->first();
+        
+            if (!$post) {
+                return response()->json(['message' => 'Post not found'], 404);
+            }
+            
+            $responseData = $post->toArray();
+            
+            return response()->json($responseData, 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error fetching post',
+                'error' => $e->getMessage()
+            ], 500);
         }
-    
-        return response()->json($post, 200);
     }
 
     public function newestPost()
@@ -101,29 +110,41 @@ class PostController extends Controller
 
     public function update(Request $request, $id)
     {
-        $user = Auth::user();
+        try {
+            $user = Auth::user();
 
-        if (!$user) {
-            return response()->json(['message' => 'Neprihlásený používateľ'], 401);
+            if (!$user) {
+                return response()->json(['message' => 'Neprihlásený používateľ'], 401);
+            }
+
+            $post = Post::find($id);
+
+            if (!$post) {
+                return response()->json(['message' => 'Post not found'], 404);
+            }
+
+            $request->validate([
+                'title' => 'required|string|max:255',
+                'body' => 'required|string',
+                'year_id' => 'required|exists:years,id',
+            ]);
+
+            $post->title = $request->input('title');
+            $post->body = $request->input('body');
+            $post->year_id = $request->input('year_id');
+            
+            $post->save();
+
+            return response()->json([
+                'message' => 'Post bol úspešne aktualizovaný',
+                'post' => $post
+            ], 200);
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'message' => 'Error updating post',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $post = Post::find($id);
-
-        if (!$post) {
-            return response()->json(['message' => 'Post not found'], 404);
-        }
-
-        // Validate required fields
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'body' => 'required|string',
-        ]);
-
-        $post->title = $request->input('title');
-        $post->body = $request->input('body');
-        
-        $post->save();
-
-        return response()->json(['message' => 'Post bol úspešne aktualizovaný'], 200);
     }
 }
