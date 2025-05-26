@@ -29,7 +29,7 @@ export const useCounterStore = defineStore('counter', {
       }
     },
     
-    async fetchUser() {
+        async fetchUser() {
       try {
         const response = await api.get('/user');
         if (response.data && response.data.pfp && !response.data.pfp.startsWith('http')) {
@@ -41,8 +41,10 @@ export const useCounterStore = defineStore('counter', {
         localStorage.setItem('user', JSON.stringify(this.user));
         
         return this.user;
-      } catch (error) {
-        console.error('Failed to fetch user:', error);
+      } catch (error: any) {
+        if (!error.response || error.response.status !== 401) {
+          console.error('Failed to fetch user:', error);
+        }
         this.isAuthenticated = false;
         localStorage.removeItem('user');
         throw error;
