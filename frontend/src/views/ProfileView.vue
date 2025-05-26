@@ -1,5 +1,6 @@
 <template>
   <NavBar />
+  <NotificationComponent/>  
   <div class="container my-5">
     <div class="row g-4 align-items-stretch">
       <div class="col-md-4">
@@ -144,26 +145,30 @@
 
 <script>
 import { useCounterStore } from "@/stores/counter";
+import { useNotificationsStore } from "@/stores/notificationsStore";
 import NavBar from "@/components/NavBarComponent.vue";
 import api from "@/api"; 
+import NotificationComponent from "@/components/NotificationComponent.vue";
 
 export default {
   name: "ProfileView",
   components: {
     NavBar,
+    NotificationComponent,
   },
   data() {
     return {
       counterStore: useCounterStore(),
+      notificationsStore: useNotificationsStore(),
       selectedUser: { name: "", email: "", password: "" },
-      passwordError: false, 
+      passwordError: false,
     };
   },
   methods: {
     async uploadProfilePicture(event) {
       const file = event.target.files[0];
       if (!file) {
-        alert("No file selected.");
+        this.notificationsStore.warning("No file selected.");
         return;
       }
 
@@ -177,8 +182,11 @@ export default {
           },
         });
         await this.counterStore.fetchUser();
+
+        this.notificationsStore.success("Profile picture uploaded successfully!");
       } catch (error) {
         console.error("Error uploading profile picture:", error);
+        this.notificationsStore.error("Failed to upload profile picture.");
       }
     },
     openEditProfileModal() {
@@ -190,10 +198,11 @@ export default {
       this.passwordError = false; 
     },
     async saveProfile() {
-       if (this.selectedUser.password && this.selectedUser.password.length < 8) {
+      if (this.selectedUser.password && this.selectedUser.password.length < 8) {
         this.passwordError = true;
         return;
       }
+      
       try {
         const response = await api.put("/profile", {
           name: this.selectedUser.name,
@@ -203,12 +212,13 @@ export default {
 
         this.counterStore.user.name = response.data.name;
         this.counterStore.user.email = response.data.email;
-
+        
+        this.notificationsStore.success("Profile updated successfully!");
       } catch (error) {
         console.error("Error updating profile:", error);
-        alert("Failed to update profile. Please try again.");
-          }
-        },
-      },
-    };
+        this.notificationsStore.error("Failed to update profile. Please try again.");
+      }
+    },
+  },
+};
 </script>

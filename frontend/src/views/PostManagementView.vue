@@ -75,6 +75,24 @@
           </tr>
         </tfoot>
       </table>
+       <div class="modal fade" id="deletePostModal" tabindex="-1" aria-labelledby="deletePostModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content border-0 shadow p-4 rounded-4">
+            <div class="modal-header border-0">
+              <h5 class="modal-title" id="deletePostModalLabel">Delete Post</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              Are you sure you want to delete post <strong>{{ selectedPost?.title }}</strong>?
+              <p class="text-danger mt-3 mb-0"><small>This action cannot be undone.</small></p>
+            </div>
+            <div class="modal-footer border-0">
+              <button class="btn btn-secondary rounded-4 px-3" data-bs-dismiss="modal">Cancel</button>
+              <button class="btn btn-danger rounded-4 px-3" @click="confirmDeletePost">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -83,6 +101,7 @@
 import NavBar from "@/components/NavBarComponent.vue";
 import { usePostStore } from "@/stores/postStore";
 import { useCounterStore } from "@/stores/counter";
+import { useNotificationsStore } from "@/stores/notificationsStore"; 
 import api from "@/api"; 
 
 export default {
@@ -92,9 +111,11 @@ export default {
     return {
       postStore: usePostStore(),
       userStore: useCounterStore(),
+      notificationsStore: useNotificationsStore(),
       searchQuery: "",
       yearFilter: "",
       sortBy: "created_desc",
+      selectedPost: null,
     };
   },
   computed: {
@@ -140,7 +161,8 @@ export default {
     },
     editPost(postId) {
       this.$router.push(`/editPost/${postId}`);
-    },    sortPosts(posts) {
+    },    
+    sortPosts(posts) {
       const sortedPosts = [...posts];
       
       const parseDate = (dateStr) => {
@@ -210,28 +232,57 @@ export default {
       }
     },
     
-    async deletePost(postId) {
-      try {
-        const confirmed = confirm("Are you sure you want to delete this post?");
-        if (!confirmed) return;
-
-        await api.get(`/deletePost/${postId}`);
-        this.postStore.posts = this.postStore.posts.filter((post) => post.id !== postId);
-
-        alert("Post deleted successfully!");
-      } catch (error) {
-        console.error("Error deleting post:", error);
-        alert("Failed to delete post. Please try again.");
+    deletePost(postId) {
+      const post = this.postStore.posts.find(p => p.id === postId);
+      if (post) {
+        this.selectedPost = post;
+        
+        // Programové otvorenie modálneho okna
+        const tempButton = document.createElement('button');
+        tempButton.setAttribute('data-bs-toggle', 'modal');
+        tempButton.setAttribute('data-bs-target', '#deletePostModal');
+        document.body.appendChild(tempButton);
+        tempButton.click();
+        document.body.removeChild(tempButton);
       }
     },
-  },  mounted() {
-    this.postStore.fetchPosts().then(() => {
-      if (this.postStore.posts.length > 0) {
-        const sample = this.postStore.posts[0];
-        if (sample.created_at) {
-        }
+    
+    // Nová metóda pre potvrdenie vymazania
+    async confirmDeletePost() {
+      if (!this.selectedPost) return;
+      
+      try {
+        await api.get(`/deletePost/${this.selectedPost.id}`);
+        this.postStore.posts = this.postStore.posts.filter((post) => post.id !== this.selectedPost.id);
+        this.closeModal('deletePostModal');
+        this.notificationsStore.success("Post deleted successfully!");
+      } catch (error) {
+        console.error("Error deleting post:", error);
+        this.notificationsStore.error("Failed to delete post. Please try again.");
       }
-    });
+    },
+    
+    // Pomocná metóda na zatvorenie modálneho okna
+    closeModal(modalId) {
+      const closeBtn = document.querySelector(`#${modalId} .btn-close`);
+      if (closeBtn) {
+        closeBtn.click();
+      }
+    },
+  },  
+  mounted() {
+    this.postStore.fetchPosts()
+      .then(() => {
+        if (this.postStore.posts.length > 0) {
+          const sample = this.postStore.posts[0];
+          if (sample.created_at) {
+          }
+        }
+      })
+      .catch(error => {
+        console.error("Error fetching posts:", error);
+        this.notificationsStore.error("Failed to load posts data.");
+      });
   },
 };
 </script>

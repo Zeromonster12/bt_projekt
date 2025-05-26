@@ -1,5 +1,5 @@
 <template>
-    <div class="edit-post container mt-5">
+  <div class="edit-post container mt-5">
     <h1 class="mb-4">Edit Post</h1>
 
     <form @submit.prevent="submitEdit">
@@ -42,6 +42,7 @@
 import api from "@/api";
 import WysiwygEditor from "@/components/WysiwygEditor.vue";
 import { useCounterStore } from "@/stores/counter"; 
+import { useNotificationsStore } from "@/stores/notificationsStore";
 
 export default {
   name: "EditPostView",
@@ -55,7 +56,8 @@ export default {
       image: "",
       years: [],
       selectedYear: null,
-      counterStore: useCounterStore(), 
+      counterStore: useCounterStore(),
+      notificationsStore: useNotificationsStore(), 
       post: null, 
     };
   },
@@ -92,8 +94,8 @@ export default {
         const postYear = this.years.find(y => y.id === response.data.year_id)?.year;
         
         if (postYear && !userYears.includes(postYear.toString())) {
-          alert("You don't have permission to edit posts from this year.");
-          this.$router.push("/postManagement");
+          this.notificationsStore.error("You don't have permission to edit posts from this year.");
+          this.$router.push("/post-management");
           return;
         }
       }
@@ -101,8 +103,8 @@ export default {
       this.selectedYear = response.data.year_id;
     } catch (error) {
       console.error("Error fetching post or years:", error);
-      alert("Failed to load post. Redirecting to Post Management.");
-      this.$router.push("/postManagement");
+      this.notificationsStore.error("Failed to load post. Redirecting to Post Management.");
+      this.$router.push("/post-management");
     }
   },
   methods: {
@@ -112,7 +114,7 @@ export default {
         const selectedYearValue = this.years.find(y => y.id === this.selectedYear)?.year;
         
         if (!userYears.includes(selectedYearValue?.toString())) {
-          alert("You don't have permission to assign posts to this year.");
+          this.notificationsStore.error("You don't have permission to assign posts to this year.");
           return;
         }
       }
@@ -125,14 +127,22 @@ export default {
           image: this.image,
           year_id: this.selectedYear, 
         });
-        alert("Post updated successfully!");
-        this.$router.push("/postManagement");
+        
+        this.notificationsStore.success("Post updated successfully!");
+        this.$router.push("/post-management");
       } catch (error) {
         console.error("Error updating post:", error);
         if (error.response) {
           console.error("Error details:", error.response.data);
+          
+          if (error.response.data && error.response.data.message) {
+            this.notificationsStore.error(error.response.data.message);
+          } else {
+            this.notificationsStore.error("Failed to update post. Please try again.");
+          }
+        } else {
+          this.notificationsStore.error("Failed to update post. Please try again.");
         }
-        alert("Failed to update post. Please try again.");
       }
     },
   },

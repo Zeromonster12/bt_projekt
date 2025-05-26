@@ -3,18 +3,18 @@
   <div class="create-post container mt-5">
     <h1 class="mb-4">Create New Post</h1>
     <div>
-    <div class="mb-3">
-      <label for="yearSelect" class="form-label">Select Year</label>
-      <select id="yearSelect" v-model="selectedYear" class="form-select">
-        <option value="" disabled>Select a year</option>
-        <option v-for="year in availableYears" :key="year.id" :value="year.id">
-          {{ year.year }}
-        </option>
-      </select>
-      <div class="invalid-feedback" :class="{ 'd-block': !selectedYear && showValidation }">
-        Please select a year
+      <div class="mb-3">
+        <label for="yearSelect" class="form-label">Select Year</label>
+        <select id="yearSelect" v-model="selectedYear" class="form-select">
+          <option value="" disabled>Select a year</option>
+          <option v-for="year in availableYears" :key="year.id" :value="year.id">
+            {{ year.year }}
+          </option>
+        </select>
+        <div class="invalid-feedback" :class="{ 'd-block': !selectedYear && showValidation }">
+          Please select a year
+        </div>
       </div>
-    </div>
 
       <input
         v-model="title"
@@ -47,6 +47,7 @@ import Navbar from "../components/NavBarComponent.vue";
 import WysiwygEditor from "@/components/WysiwygEditor.vue";
 import { usePostStore } from "@/stores/postStore";
 import { useCounterStore } from "@/stores/counter";
+import { useNotificationsStore } from "@/stores/notificationsStore";
 
 export default {
   components: {
@@ -61,7 +62,8 @@ export default {
       isSubmitting: false,
       showValidation: false,
       postStore: usePostStore(),
-      counterStore: useCounterStore(), 
+      counterStore: useCounterStore(),
+      notificationsStore: useNotificationsStore()
     };
   },
   computed: {
@@ -89,8 +91,11 @@ export default {
       this.showValidation = true;
 
       if (!this.title.trim() || !this.content.trim() || !this.selectedYear) {
+        this.notificationsStore.warning("Please fill all required fields");
         return;
-      }      this.isSubmitting = true;
+      }
+      
+      this.isSubmitting = true;
       try {
         const res = await api.post("/createPost", {
           title: this.title,
@@ -98,27 +103,31 @@ export default {
           year_id: this.selectedYear
         });
 
-        alert(res.data.message || 'Post created successfully');
+        this.notificationsStore.success(res.data.message || 'Post created successfully');
         
         this.postStore.fetchPosts();
-        this.$router.push("/");
+        this.$router.push("/postManagement");
       } catch (err) {
         console.error(err);
         
         if (err.response && err.response.data && err.response.data.message) {
-          alert(err.response.data.message);
+          this.notificationsStore.error(err.response.data.message);
         } else if (err.response && err.response.data && err.response.data.errors) {
           const errorMessages = Object.values(err.response.data.errors).flat();
-          alert(errorMessages.join('\n'));
+          this.notificationsStore.error(errorMessages.join(', '));
         } else {
-          alert("Failed to create post. Please try again.");
+          this.notificationsStore.error("Failed to create post. Please try again.");
         }
       } finally {
         this.isSubmitting = false;
-      }},
+      }
+    },
   },  
   async mounted() {
-    await this.postStore.fetchYearsWithId();
+    await this.postStore.fetchYearsWithId().catch(error => {
+      console.error("Error loading years:", error);
+      this.notificationsStore.error("Failed to load years. Please refresh the page.");
+    });
     
     const queryYear = parseInt(this.$route.query.year);
     

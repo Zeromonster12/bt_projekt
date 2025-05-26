@@ -46,6 +46,7 @@
 
 <script>
 import { useCounterStore } from '../stores/counter';
+import { useNotificationsStore } from '@/stores/notificationsStore';
 import Navbar from '../components/NavBarComponent.vue';
 import csrf from '@/csrf';
 
@@ -57,6 +58,7 @@ export default {
   data() {
     return {
       counter: useCounterStore(),
+      notificationsStore: useNotificationsStore(),
       creds: {
         email: '',
         password: '',
@@ -80,6 +82,7 @@ export default {
           } catch (error) {
             console.warn('Could not fetch additional user data:', error);
           }
+          this.notificationsStore.success('Prihlásenie úspešné!');
           this.$router.push('/');
         } else {
           this.errorMessage = 'Zlé prihlasovacie údaje';

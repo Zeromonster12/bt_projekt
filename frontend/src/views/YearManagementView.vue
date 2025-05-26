@@ -214,6 +214,7 @@ import NavBar from "@/components/NavBarComponent.vue";
 import { usePostStore } from "@/stores/postStore";
 import api from "@/api";
 import { useCounterStore } from "@/stores/counter";
+import { useNotificationsStore } from "@/stores/notificationsStore";
 
 export default {
   name: "YearManagementView",
@@ -223,9 +224,10 @@ export default {
       newYear: "",
       selectedYear: "",
       counterStore: useCounterStore(),
+      notificationsStore: useNotificationsStore(),
     };
   },
-    computed: {
+  computed: {
     postStore() {
       return usePostStore();
     },
@@ -237,6 +239,7 @@ export default {
         await this.postStore.fetchYearsWithId();
       } catch (error) {
         console.error("Error fetching years:", error);
+        this.notificationsStore.error("Failed to load years");
       }
     },
 
@@ -244,7 +247,7 @@ export default {
       try {
         if (this.newYear) {
           if (!this.counterStore.user || !this.counterStore.user.id) {
-            alert("Používateľ nie je prihlásený. Prihláste sa, prosím.");
+            this.notificationsStore.warning("User is not logged in. Please log in first.");
             return;
           }
           
@@ -253,14 +256,17 @@ export default {
             user_id: this.counterStore.user.id,
           });
           this.newYear = "";
-          this.fetchYears();
+          await this.fetchYears();
+          this.notificationsStore.success("Year added successfully!");
+        } else {
+          this.notificationsStore.warning("Please enter a year");
         }
       } catch (error) {
         if (error.response && error.response.status === 400) {
-          alert(error.response.data.message);
+          this.notificationsStore.error(error.response.data.message);
         } else {
           console.error("Error adding year:", error);
-          alert("Nastala chyba pri pridávaní ročníka.");
+          this.notificationsStore.error("Failed to add year");
         }
       }
     },
@@ -275,14 +281,15 @@ export default {
           await api.put(`/years/${this.selectedYear.id}`, {
             year: this.selectedYear.year,
           });
-          this.fetchYears();
+          await this.fetchYears();
+          this.notificationsStore.success("Year updated successfully!");
         }
       } catch (error) {
         if (error.response && error.response.status === 400) {
-          alert(error.response.data.message);
+          this.notificationsStore.error(error.response.data.message);
         } else {
           console.error("Error updating year:", error);
-          alert("Nastala chyba pri aktualizácii ročníka.");
+          this.notificationsStore.error("Failed to update year");
         }
       }
     },
@@ -295,12 +302,15 @@ export default {
       try {
         if (this.selectedYear.id) {
           await api.delete(`/years/${this.selectedYear.id}`);
-          this.fetchYears();
+          await this.fetchYears();
+          this.notificationsStore.success("Year deleted successfully!");
         } else {
           console.error("No selected year to delete.");
+          this.notificationsStore.error("No year selected for deletion");
         }
       } catch (error) {
         console.error("Error deleting year:", error);
+        this.notificationsStore.error("Failed to delete year");
       }
     },
   },

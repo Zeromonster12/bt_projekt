@@ -1,10 +1,16 @@
 <script>
 import { useCounterStore } from './stores/counter'
+import { useNotificationsStore } from './stores/notificationsStore'
+import NotificationComponent from '@/components/NotificationComponent.vue'
 
 export default {
+  components: {
+    NotificationComponent
+  },
   data() {
     return {
       counter: useCounterStore(),
+      notificationsStore: useNotificationsStore(),
       loading: false,
     }
   },
@@ -29,6 +35,7 @@ export default {
       <span class="visually-hidden">Loading...</span>
     </div>
   </div>
+  <NotificationComponent />
   <RouterView />
 </template>
 

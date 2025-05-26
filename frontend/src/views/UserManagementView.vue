@@ -164,6 +164,7 @@
 import api from "@/api";
 import NavBar from "@/components/NavBarComponent.vue";
 import { useUserStore } from "@/stores/userStore";
+import { useNotificationsStore } from "@/stores/notificationsStore";
 
 export default {
   name: "UserManagementView",
@@ -171,12 +172,14 @@ export default {
   data() {
     return {
       store: useUserStore(),
+      notificationsStore: useNotificationsStore(),
       searchQuery: "",
       maxYearsToShow: 5,
       selectedUser: { id: null, name: "", email: "", role_id: null, years: [] },
       newUser: { name: "", email: "", role_id: null, years: [] },
     };
-  },  computed: {
+  },  
+  computed: {
     filteredUsers() {
       return Array.isArray(this.store.users) 
         ? this.store.users.filter((user) => user.name.toLowerCase().includes(this.searchQuery.toLowerCase()))
@@ -220,11 +223,13 @@ export default {
           await this.store.createUser(this.newUser);
           this.newUser = { name: "", email: "", role_id: null, years: [] };
           this.closeModal('addUserModal');
+          this.notificationsStore.success("User created successfully!");
         } catch (error) {
-          alert("Failed to create user. Please try again.");
+          console.error("Error creating user:", error);
+          this.notificationsStore.error("Failed to create user. Please try again.");
         }
       } else {
-        alert("Please fill in all fields.");
+        this.notificationsStore.warning("Please fill in all required fields.");
       }
     },
     closeModal(modalId) {
@@ -260,11 +265,14 @@ export default {
       this.store.updateUsers()
         .then(() => {
           this.closeModal('editUserModal');
+          this.notificationsStore.success("User updated successfully!");
         })
         .catch(error => {
-          alert('Failed to update user: ' + (error.response?.data?.error || 'Unknown error'));
+          console.error("Error updating user:", error);
+          this.notificationsStore.error(error.response?.data?.error || "Failed to update user.");
         });
-    },    confirmDelete(user) {
+    },  
+    confirmDelete(user) {
       this.selectedUser = { ...user };
       
       const tempButton = document.createElement('button');
@@ -274,18 +282,29 @@ export default {
       tempButton.click();
       document.body.removeChild(tempButton);
     },
-      async deleteUser() {
+    async deleteUser() {
       try {
         await this.store.deleteUser(this.selectedUser.id);
         this.closeModal('deleteUserModal');
+        this.notificationsStore.success("User deleted successfully!");
       } catch (error) {
         console.error("Error deleting user:", error);
-        alert("Failed to delete user. Please try again.");
+        this.notificationsStore.error("Failed to delete user. Please try again.");
       }
     },
-  },  mounted() {
-    this.store.fetchYears();
-    this.store.fetchUsers();
+  },  
+    mounted() {
+      this.store.fetchYears()
+        .catch(error => {
+          console.error("Error fetching years:", error);
+          this.notificationsStore.error("Failed to load years data.");
+      });
+      
+      this.store.fetchUsers()
+        .catch(error => {
+         console.error("Error fetching users:", error);
+         this.notificationsStore.error("Failed to load users data.");
+      });
   },
 };
 </script>
