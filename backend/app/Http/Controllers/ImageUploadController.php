@@ -12,7 +12,7 @@ class ImageUploadController
     public function upload(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|mimes:jpg,jpeg,png|max:5120',
+            'file' => 'required|file|mimes:jpg,jpeg,png|max:20480',
         ]);
 
         try {
@@ -36,7 +36,7 @@ class ImageUploadController
     {
         try {
             $request->validate([
-                'file' => 'required|file|mimes:jpg,jpeg,png|max:5120',
+                'file' => 'required|file|mimes:jpg,jpeg,png|max:20480',
             ]);
             
             $file = $request->file('file');

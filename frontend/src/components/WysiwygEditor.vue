@@ -28,9 +28,9 @@ export default {
       editorConfig: {
         height: 500,
         menubar: true,
-        plugins: 'link code lists image table fontsize',
+        plugins: 'link code lists image table',
         toolbar:
-          'undo redo | formatselect | fontsizeselect | bold italic | alignleft aligncenter alignright | link image file | table | bullist numlist | code',
+          'undo redo | formatselect | bold italic | alignleft aligncenter alignright | link image file | table | bullist numlist | code',
         content_style: `
           body { font-family:Arial, sans-serif; font-size:14px }
           .file-link { 
