@@ -4,14 +4,16 @@
   <div class="container my-5">
     <div class="row g-4 align-items-stretch">
       <div class="col-md-4">
-        <div class="card shadow-sm border-0 text-center p-5 rounded-4 h-100">
-          <label for="profilePictureUpload" class="profile-icon-label position-relative d-inline-block">
-            <template v-if="counterStore.user?.pfp">
+        <div class="card shadow-sm border-0 text-center p-5 rounded-4 h-100">          
+        <label for="profilePictureUpload" class="profile-icon-label position-relative d-inline-block">
+            <template v-if="shouldShowProfileImage">
               <img
                 :src="counterStore.user.pfp"
                 alt="Profile Picture"
                 class="rounded-circle mb-3 profile-img"
                 style="width: 100px; height: 100px; object-fit: cover;"
+                @error="handleImageError"
+                ref="profileImage"
               />
               <span class="edit-overlay d-flex justify-content-center align-items-center">
                 <font-awesome-icon icon="pencil" size="2x" />
@@ -24,7 +26,7 @@
                 class="mb-3 text-secondary profile-icon"
               />
               <span class="edit-overlay d-flex justify-content-center align-items-center">
-                <font-awesome-icon icon="arrow-left" size="2x" />
+                <font-awesome-icon icon="pencil" size="2x" />
               </span>
             </template>
           </label>
@@ -155,16 +157,39 @@ export default {
   components: {
     NavBar,
     NotificationComponent,
-  },
+  },  
   data() {
     return {
       counterStore: useCounterStore(),
       notificationsStore: useNotificationsStore(),
       selectedUser: { name: "", email: "", password: "" },
       passwordError: false,
+      imageLoadError: false,
     };
   },
+  computed: {
+    shouldShowProfileImage() {
+      if (!this.counterStore.user?.pfp || this.imageLoadError) {
+        return false;
+      }
+      
+      // Check if it's not the default profile picture path
+      const defaultPath = 'storage/profilePictures/defaultpfp.jpg';
+      const userPfp = this.counterStore.user.pfp;
+      
+      // Check if the path ends with the default path
+      if (userPfp.endsWith(defaultPath)) {
+        return false;
+      }
+      
+      return true;
+    }
+  },  
   methods: {
+    handleImageError() {
+      this.imageLoadError = true;
+      console.warn("Failed to load profile image");
+    },
     async uploadProfilePicture(event) {
       const file = event.target.files[0];
       if (!file) {
@@ -180,8 +205,8 @@ export default {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        });
-        await this.counterStore.fetchUser();
+        });        await this.counterStore.fetchUser();
+        this.imageLoadError = false;  // Reset the error flag
 
         this.notificationsStore.success("Profile picture uploaded successfully!");
       } catch (error) {
