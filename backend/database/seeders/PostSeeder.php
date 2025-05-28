@@ -13,9 +13,6 @@ class PostSeeder extends Seeder
      */
     public function run(): void
     {
-        Post::factory()->create([
-            'title' => 'Test Post',
-            'body' => 'This is a test post.',
-        ]);
+        Post::factory()->count(30)->create();
     }
 }

@@ -20,16 +20,17 @@ export default {
       type: String,
       default: ''
     }
-  },  data() {
+  },
+  data() {
     return {
       innerContent: this.modelValue,
       editorInstance: null,
       editorConfig: {
         height: 500,
         menubar: true,
-        plugins: 'link code lists image media',
+        plugins: 'link code lists image table fontsize',
         toolbar:
-          'undo redo | formatselect | bold italic | alignleft aligncenter alignright | link image media file | bullist numlist | code',
+          'undo redo | formatselect | fontsizeselect | bold italic | alignleft aligncenter alignright | link image file | table | bullist numlist | code',
         content_style: `
           body { font-family:Arial, sans-serif; font-size:14px }
           .file-link { 
@@ -48,20 +49,22 @@ export default {
         `,
         images_upload_handler: this.handleImageUpload,
         automatic_uploads: true,
-        file_picker_types: 'file image media',
+        file_picker_types: 'file image',
         file_picker_callback: this.filePickerCallback,
 
         setup: function(editor) {
           this.editorInstance = editor;
-          
           editor.ui.registry.addButton('file', {
             icon: 'document-properties',
             tooltip: 'Upload and Insert File',
-            onAction: function() {
-              editor.execCommand('mceMedia');
+            onAction: () => {
+              this.filePickerCallback((url) => {
+                editor.insertContent(`<a href="${url}" class="file-link">${url}</a>`);
+              }, '', { filetype: 'file' });
             }
           });
-        }.bind(this)      }
+        }.bind(this)
+      }
     }
   },
   watch: {
@@ -94,15 +97,14 @@ export default {
         .catch(error => {
           reject('Image upload failed: ' + error.message);
         });
-      });    },
+      });
+    },
     filePickerCallback(callback, value, meta) {
       const input = document.createElement('input');
       input.setAttribute('type', 'file');
       
       if (meta.filetype === 'image') {
         input.setAttribute('accept', 'image/*');
-      } else if (meta.filetype === 'media') {
-        input.setAttribute('accept', '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.txt');
       } else {
         input.setAttribute('accept', '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.txt');
       }
@@ -115,8 +117,9 @@ export default {
         formData.append('file', file);
         
         const self = this;
-        
-        api.post('/upload-file', formData, {
+        const endpoint = meta.filetype === 'image' ? '/upload-image' : '/upload-file';
+
+        api.post(endpoint, formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
@@ -128,12 +131,12 @@ export default {
           
           const textTypes = ['txt', 'log', 'md', 'csv'];
           const docTypes = ['doc', 'docx', 'pdf', 'xls', 'xlsx', 'ppt', 'pptx', 'zip', 'rar'];
-            if (textTypes.includes(fileExt) || docTypes.includes(fileExt)) {
+          if (meta.filetype === 'image') {
+            callback(fileUrl, { alt: fileName });
+          } else if (textTypes.includes(fileExt) || docTypes.includes(fileExt)) {
             const html = `<a href="${fileUrl}" download="${fileName}" class="file-link">${fileName}</a>`;
             self.editorInstance.insertContent(html);
             callback('');
-          }else if (meta.filetype === 'image') {
-            callback(fileUrl, { alt: fileName });
           } else {
             callback(fileUrl, { title: fileName });
           }
@@ -145,16 +148,6 @@ export default {
       }.bind(this);
       
       input.click();
-    }
-  },
-  watch: {
-    modelValue(newVal) {
-      if (newVal !== this.innerContent) {
-        this.innerContent = newVal
-      }
-    },
-    innerContent(newVal) {
-      this.$emit('update:modelValue', newVal)
     }
   }
 }

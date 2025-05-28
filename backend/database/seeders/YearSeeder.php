@@ -13,6 +13,6 @@ class YearSeeder extends Seeder
      */
     public function run(): void
     {
-        Year::factory()->count(3)->create();
+        Year::factory()->count(7)->create();
     }
 }
