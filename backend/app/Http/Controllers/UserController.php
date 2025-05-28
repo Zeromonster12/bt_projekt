@@ -107,9 +107,8 @@ class UserController
         }
 
         $user = Auth::user();
-        $token = $user->createToken('auth-token')->plainTextToken;
-        
-        $response = response()->json([
+
+        return response()->json([
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
@@ -119,36 +118,16 @@ class UserController
             ],
             'message' => 'Prihlásenie bolo úspešné.'
         ]);
-        
-        $response->cookie(
-            'auth_token',
-            $token,
-            120,
-            '/',
-            null,
-            config('app.env') === 'production',
-            true,
-            false,
-            'lax'
-        );
-        
-        return $response;
     }
 
     public function logout(Request $request)
     {
-        if ($request->user()) {
-            $request->user()->tokens()->delete();
-        }
-        
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        $response = response()->json(['message' => 'Odhlásenie prebehlo úspešne.']);
-        $response->cookie('auth_token', '', -1);
         
-        return $response;
+        return response()->json(['message' => 'Odhlásenie prebehlo úspešne.']);
     }
 
     public function fetchUsers()
