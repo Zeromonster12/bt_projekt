@@ -7,7 +7,7 @@ use App\Models\Year;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
 
-class YearController extends Controller
+class YearController
 {
     public function index() {
         return Year::all();
@@ -32,8 +32,15 @@ class YearController extends Controller
     }
 
     public function destroy(Year $id) {
-        $id->delete();
-        return response()->json(['message' => 'Ročník bol odstranený.'], 200);
+        try {
+            $id->delete();
+            return response()->json(['message' => 'Ročník bol odstranený.'], 200);
+        } catch (QueryException $e) {
+            if ($e->getCode() === '23000') {
+                return response()->json(['message' => 'Ročník obsahuje príspevky.'], 400);
+            }
+            return response()->json(['message' => 'Nastala chyba pri odstraňovaní ročníka.'], 500);
+        }
     }
 
     public function update(Request $request, $id)

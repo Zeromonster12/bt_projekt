@@ -11,7 +11,7 @@ use Str;
 use Illuminate\Support\Facades\Cookie;
 use Symfony\Component\HttpFoundation\Cookie as SymfonyCookie;
 
-class UserController extends Controller
+class UserController
 {
     public function createUser(Request $request)
     {

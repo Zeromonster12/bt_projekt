@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\Post;
 use App\Models\Year;
 
-class PostController extends Controller
+class PostController
 {
     public function index()
     {
