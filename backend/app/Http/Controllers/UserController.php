@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cookie;
 use Symfony\Component\HttpFoundation\Cookie as SymfonyCookie;
+use App\Mail\UserCreatedMail;
+use Illuminate\Support\Facades\Mail;
 
 class UserController
 {
@@ -20,16 +22,25 @@ class UserController
             'email' => 'required|email|unique:users,email',
             'role_id' => 'required|integer',
         ]);
-
-        $password = Str::random(8);
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'role_id' => $request->role_id,
-            'password' => Hash::make($password)
-        ]);
-
-        return response()->json(['message' => 'User created successfully with password: ' . $password]);
+    
+        try {
+            $password = Str::random(12);
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'role_id' => $request->role_id,
+                'password' => Hash::make($password)
+            ]);
+    
+            Mail::to($user->email)->send(new UserCreatedMail($user, $password));
+    
+            return response()->json(['message' => 'User created successfully.']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'User creation failed.',
+                'details' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function deleteUser($id)
