@@ -41,14 +41,18 @@
           </button>
         </form>
 
-        <div v-if="user" class="dropdown">
-          <div
+        <div v-if="user" class="dropdown">          <div
             class="profile-circle"
             id="profileDropdown"
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            <img :src="user.pfp" alt="Profilovka" class="profile-img" />
+            <template v-if="isDefaultProfilePicture">
+              <font-awesome-icon icon="user-circle" size="lg" class="profile-icon" />
+            </template>
+            <template v-else>
+              <img :src="user.pfp" alt="Profilovka" class="profile-img" @error="handleProfileImageError" />
+            </template>
           </div>
           <ul class="dropdown-menu dropdown-menu-end p-4 border-1 rounded-4" aria-labelledby="profileDropdown">
             <li>
@@ -87,19 +91,38 @@
 import { useCounterStore } from '@/stores/counter';
 
 export default {
-  name: "NavBarComponent",
+  name: "NavBarComponent",  
   data() {
     return {
       searchPhrase: "",
       counter: useCounterStore(),
+      profileImageError: false,
     };
   },
   computed: {
     user() {
       return this.counter.user;
     },
-  },
+    isDefaultProfilePicture() {
+      if (!this.user?.pfp || this.profileImageError) {
+        return true;
+      }
+      
+      const defaultPath = 'storage/profilePictures/defaultpfp.jpg';
+      const userPfp = this.user.pfp;
+      
+      if (userPfp.endsWith(defaultPath)) {
+        return true;
+      }
+      
+      return false;
+    }
+  },  
   methods: {
+    handleProfileImageError() {
+      this.profileImageError = true;
+      console.warn("Failed to load profile image in navbar");
+    },
     searchPosts() {
       if (this.searchPhrase.trim() === "") {
         alert("Please enter a search phrase.");

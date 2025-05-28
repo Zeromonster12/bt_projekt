@@ -45,6 +45,14 @@ class ImageUploadController
             $path = $file->storeAs('profilePictures', $fileName, 'public');
 
             $user = $request->user();
+            
+            if ($user->pfp && $user->pfp !== 'storage/profilePictures/defaultpfp.jpg') {
+                $oldPath = str_replace('storage/', '', $user->pfp);
+                if (Storage::disk('public')->exists($oldPath)) {
+                    Storage::disk('public')->delete($oldPath);
+                }
+            }
+            
             $user->pfp = 'storage/' . $path;
             $user->save();
 
