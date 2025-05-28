@@ -8,22 +8,26 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\Post;
 use App\Models\Year;
 
-class PostController extends Controller
+class PostController
 {
     public function index()
     {
-        return Post::select(
-                'posts.id', 
-                'posts.title', 
-                'posts.body', 
-                'posts.created_at', 
-                'posts.updated_at', 
-                'years.year',
-                'users.name as user_name'
-            )
-            ->join('years', 'posts.year_id', '=', 'years.id')
-            ->join('users', 'posts.user_id', '=', 'users.id')
-            ->get();
+        $posts = Post::with(['year', 'user'])
+            ->select('id', 'title', 'body', 'created_at', 'updated_at', 'year_id', 'user_id')
+            ->get()
+            ->map(function ($post) {
+                return [
+                    'id' => $post->id,
+                    'title' => $post->title,
+                    'body' => $post->body,
+                    'created_at' => $post->created_at,
+                    'updated_at' => $post->updated_at,
+                    'year' => $post->year->year ?? null,
+                    'user_name' => $post->user->name ?? null,
+                ];
+            });
+
+        return response()->json($posts);
     }
 
     public function show(Request $request)

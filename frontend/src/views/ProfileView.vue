@@ -185,9 +185,15 @@ export default {
 
         this.notificationsStore.success("Profile picture uploaded successfully!");
       } catch (error) {
-        console.error("Error uploading profile picture:", error);
-        this.notificationsStore.error("Failed to upload profile picture.");
-      }
+          console.error("Error uploading profile picture:", error);
+          if (error.response && error.response.data) {
+            console.error("Backend error:", error.response.data);
+            this.notificationsStore.error(
+              error.response.data.message) 
+          } else {
+            this.notificationsStore.error("Failed to upload profile picture.");
+          }
+        }
     },
     openEditProfileModal() {
       this.selectedUser = {

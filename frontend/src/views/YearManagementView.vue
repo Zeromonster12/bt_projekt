@@ -310,10 +310,16 @@ export default {
         }
       } catch (error) {
         console.error("Error deleting year:", error);
-        this.notificationsStore.error("Failed to delete year");
+        if (error.response && error.response.data && error.response.data.message) {
+          this.notificationsStore.error(error.response.data.message);
+          console.error("Backend message:", error.response.data.message);
+        } else {
+          this.notificationsStore.error("Failed to delete year");
+        }
       }
     },
   },
+  
   mounted() {
     this.fetchYears();
   },
