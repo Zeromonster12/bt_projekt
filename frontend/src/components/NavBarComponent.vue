@@ -20,12 +20,6 @@
           <li class="nav-item">
             <router-link class="nav-link px-4" to="/">Home</router-link>
           </li>
-          <li class="nav-item">
-            <router-link class="nav-link px-4" to="/">About</router-link>
-          </li>
-          <li class="nav-item">
-            <router-link class="nav-link px-4" to="/">Contact</router-link>
-          </li>
         </ul>
         <form class="d-flex me-3" @submit.prevent="searchPosts">
           <input

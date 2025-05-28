@@ -7,13 +7,7 @@
                     <p class="small">A brief description of your company or project can go here.</p>
                 </div>
                 <div class="col-md-4">
-                    <h5>Quick Links</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="#" class="text-light">Home</a></li>
-                        <li><a href="#" class="text-light">Services</a></li>
-                        <li><a href="#" class="text-light">Contact</a></li>
-                        <li><a href="#" class="text-light">FAQ</a></li>
-                    </ul>
+
                 </div>
                 <div class="col-md-4">
                     <h5>Contact Info</h5>
