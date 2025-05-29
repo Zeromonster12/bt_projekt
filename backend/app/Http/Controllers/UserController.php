@@ -2,14 +2,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\Role;
-use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Cookie;
-use Symfony\Component\HttpFoundation\Cookie as SymfonyCookie;
 use App\Mail\UserCreatedMail;
 use Illuminate\Support\Facades\Mail;
 
